@@ -1,0 +1,240 @@
+import { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { AdminLayout } from '@/app/components/AdminLayout';
+import { Button } from '@/app/components/ui/button';
+import { Input } from '@/app/components/ui/input';
+import { Card } from '@/app/components/ui/card';
+import { Badge } from '@/app/components/ui/badge';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/app/components/ui/select';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/app/components/ui/dropdown-menu';
+import { ConfirmationModal } from '@/app/components/ConfirmationModal';
+import { Search, Plus, MoreVertical } from 'lucide-react';
+import { STUDENTS } from '@/data/constants';
+import { toast } from 'sonner';
+
+export default function StudentManagement() {
+  const navigate = useNavigate();
+  const [searchTerm, setSearchTerm] = useState('');
+  const [gradeFilter, setGradeFilter] = useState('all');
+  const [statusFilter, setStatusFilter] = useState('all');
+  const [selectedStudent, setSelectedStudent] = useState<string | null>(null);
+  const [showDeactivateModal, setShowDeactivateModal] = useState(false);
+  const [showArchiveModal, setShowArchiveModal] = useState(false);
+
+  const studentsWithStatus = STUDENTS.map(student => ({
+    ...student,
+    status: 'Active' as const,
+  }));
+
+  const filteredStudents = studentsWithStatus.filter((student) => {
+    const matchesSearch =
+      searchTerm === '' ||
+      student.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      student.id.toLowerCase().includes(searchTerm.toLowerCase());
+    
+    const matchesGrade = gradeFilter === 'all' || student.grade.toString() === gradeFilter;
+    const matchesStatus = statusFilter === 'all' || student.status === statusFilter;
+
+    return matchesSearch && matchesGrade && matchesStatus;
+  });
+
+  const handleDeactivate = () => {
+    if (selectedStudent) {
+      const studentIndex = studentsWithStatus.findIndex(student => student.id === selectedStudent);
+      if (studentIndex !== -1) {
+        studentsWithStatus[studentIndex].status = 'Inactive';
+        toast.success('Student deactivated successfully');
+      }
+    }
+    setShowDeactivateModal(false);
+  };
+
+  const handleArchive = () => {
+    if (selectedStudent) {
+      const studentIndex = studentsWithStatus.findIndex(student => student.id === selectedStudent);
+      if (studentIndex !== -1) {
+        studentsWithStatus[studentIndex].status = 'Archived';
+        toast.success('Student archived successfully');
+      }
+    }
+    setShowArchiveModal(false);
+  };
+
+  return (
+    <AdminLayout>
+      <div className="p-6 max-w-7xl mx-auto">
+        {/* Header */}
+        <div className="mb-6 flex items-start justify-between">
+          <div>
+            <h1 className="text-2xl mb-2">Student Management</h1>
+            <p className="text-[#757575]">Manage student accounts, assignments, and status</p>
+          </div>
+          <Button
+            onClick={() => navigate('/admin/students/new')}
+            className="bg-[#333333] hover:bg-[#1A1A1A] text-white"
+          >
+            <Plus className="w-4 h-4 mr-2" />
+            Add Student
+          </Button>
+        </div>
+
+        <div className="flex gap-4 mb-6">
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-[#757575]" />
+            <Input
+              placeholder="Search by student name or ID..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-10 border-[#D0D0D0] text-[#1A1A1A]"
+            />
+          </div>
+          <Select value={gradeFilter} onValueChange={setGradeFilter}>
+            <SelectTrigger className="w-48 border-[#D0D0D0] text-[#1A1A1A]">
+              <SelectValue placeholder="All Grades" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Grades</SelectItem>
+              <SelectItem value="2">Grade 2</SelectItem>
+              <SelectItem value="3">Grade 3</SelectItem>
+              <SelectItem value="4">Grade 4</SelectItem>
+              <SelectItem value="5">Grade 5</SelectItem>
+            </SelectContent>
+          </Select>
+          <Select value={statusFilter} onValueChange={setStatusFilter}>
+            <SelectTrigger className="w-48 border-[#D0D0D0] text-[#1A1A1A]">
+              <SelectValue placeholder="All Status" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Status</SelectItem>
+              <SelectItem value="Active">Active</SelectItem>
+              <SelectItem value="Inactive">Inactive</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div className="mb-4 text-sm text-[#757575]">
+          Showing {filteredStudents.length} of {studentsWithStatus.length} students
+        </div>
+
+        {filteredStudents.length === 0 ? (
+          <Card className="border-[#D0D0D0] p-12">
+            <div className="text-center">
+              <p className="text-[#757575] mb-4">No students found matching your criteria</p>
+              <Button
+                onClick={() => {
+                  setSearchTerm('');
+                  setGradeFilter('all');
+                  setStatusFilter('all');
+                }}
+                variant="outline"
+                className="border-[#9E9E9E] text-[#333333] hover:bg-[#F5F5F5]"
+              >
+                Clear Filters
+              </Button>
+            </div>
+          </Card>
+        ) : (
+          <div className="bg-white border border-[#D0D0D0] rounded-lg overflow-hidden">
+            <table className="w-full">
+              <thead>
+                <tr className="bg-[#F5F5F5] border-b border-[#D0D0D0]">
+                  <th className="text-left p-4 text-sm font-medium text-[#4A4A4A]">Name</th>
+                  <th className="text-left p-4 text-sm font-medium text-[#4A4A4A]">Student ID</th>
+                  <th className="text-left p-4 text-sm font-medium text-[#4A4A4A]">Grade</th>
+                  <th className="text-left p-4 text-sm font-medium text-[#4A4A4A]">Primary Teacher</th>
+                  <th className="text-left p-4 text-sm font-medium text-[#4A4A4A]">Status</th>
+                  <th className="text-left p-4 text-sm font-medium text-[#4A4A4A]">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredStudents.map((student, index) => (
+                  <tr
+                    key={student.id}
+                    className={`border-b border-[#E0E0E0] hover:bg-[#FAFAFA] ${
+                      index % 2 === 0 ? 'bg-white' : 'bg-[#FAFAFA]'
+                    }`}
+                  >
+                    <td className="p-4 text-[#1A1A1A] font-medium">{student.name}</td>
+                    <td className="p-4 text-[#4A4A4A]">{student.id}</td>
+                    <td className="p-4 text-[#4A4A4A]">Grade {student.grade}</td>
+                    <td className="p-4 text-[#4A4A4A]">{student.primaryTeacher}</td>
+                    <td className="p-4">
+                      <Badge className="bg-[#333333] text-white">{student.status}</Badge>
+                    </td>
+                    <td className="p-4">
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                            <MoreVertical className="w-4 h-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem onClick={() => navigate(`/admin/students/${student.id}`)}>
+                            View Profile
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => navigate(`/admin/students/${student.id}/edit`)}>
+                            Edit
+                          </DropdownMenuItem>
+                          <DropdownMenuItem>Assign Parent</DropdownMenuItem>
+                          <DropdownMenuItem
+                            className="text-[#757575]"
+                            onClick={() => {
+                              setSelectedStudent(student.id);
+                              setShowDeactivateModal(true);
+                            }}
+                          >
+                            Deactivate
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            className="text-[#757575]"
+                            onClick={() => {
+                              setSelectedStudent(student.id);
+                              setShowArchiveModal(true);
+                            }}
+                          >
+                            Archive
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+
+      <ConfirmationModal
+        open={showDeactivateModal}
+        onOpenChange={setShowDeactivateModal}
+        onConfirm={handleDeactivate}
+        title="Deactivate Student"
+        description="Are you sure you want to deactivate this student? They will no longer appear in active student lists."
+        confirmText="Deactivate"
+        variant="destructive"
+      />
+
+      <ConfirmationModal
+        open={showArchiveModal}
+        onOpenChange={setShowArchiveModal}
+        onConfirm={handleArchive}
+        title="Archive Student"
+        description="Are you sure you want to archive this student? Archived students can only be accessed through the archive view."
+        confirmText="Archive"
+        variant="destructive"
+      />
+    </AdminLayout>
+  );
+}
