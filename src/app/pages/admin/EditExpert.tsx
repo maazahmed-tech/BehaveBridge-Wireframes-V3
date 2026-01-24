@@ -5,7 +5,6 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/app/components/ui/ca
 import { Button } from '@/app/components/ui/button';
 import { Input } from '@/app/components/ui/input';
 import { Label } from '@/app/components/ui/label';
-import { Textarea } from '@/app/components/ui/textarea';
 import { Badge } from '@/app/components/ui/badge';
 import { ArrowLeft, Award } from 'lucide-react';
 import { toast } from 'sonner';
@@ -21,11 +20,6 @@ export default function EditExpert() {
     lastName: 'Williams',
     email: 'sarah.williams@behaviorexpert.com',
     phone: '(555) 234-5678',
-    credentials: 'Ph.D. in School Psychology, BCBA',
-    specializations: 'Behavioral Interventions, Autism Spectrum, ADHD',
-    licenseNumber: 'PSY-12345',
-    bio: 'Board Certified Behavior Analyst with 15 years of experience supporting students with behavioral challenges in educational settings.',
-    maxCaseload: '15',
     availability: 'Full-time',
     status: 'Active'
   });
@@ -203,88 +197,22 @@ export default function EditExpert() {
 
           <Card className="mb-6 border-[#D0D0D0]">
             <CardHeader>
-              <CardTitle className="text-[#1A1A1A]">Professional Qualifications</CardTitle>
+              <CardTitle className="text-[#1A1A1A]">Availability</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div>
-                <Label htmlFor="credentials" className="text-[#4A4A4A]">Credentials & Certifications *</Label>
-                <Input
-                  id="credentials"
+                <Label htmlFor="availability" className="text-[#4A4A4A]">Availability *</Label>
+                <select
+                  id="availability"
                   required
-                  value={formData.credentials}
-                  onChange={(e) => setFormData({ ...formData, credentials: e.target.value })}
-                  className="border-[#D0D0D0] text-[#1A1A1A]"
-                />
-              </div>
-
-              <div>
-                <Label htmlFor="licenseNumber" className="text-[#4A4A4A]">License Number</Label>
-                <Input
-                  id="licenseNumber"
-                  value={formData.licenseNumber}
-                  onChange={(e) => setFormData({ ...formData, licenseNumber: e.target.value })}
-                  className="border-[#D0D0D0] text-[#1A1A1A]"
-                />
-              </div>
-
-              <div>
-                <Label htmlFor="specializations" className="text-[#4A4A4A]">Areas of Specialization *</Label>
-                <Input
-                  id="specializations"
-                  required
-                  value={formData.specializations}
-                  onChange={(e) => setFormData({ ...formData, specializations: e.target.value })}
-                  className="border-[#D0D0D0] text-[#1A1A1A]"
-                />
-              </div>
-
-              <div>
-                <Label htmlFor="bio" className="text-[#4A4A4A]">Professional Bio</Label>
-                <Textarea
-                  id="bio"
-                  value={formData.bio}
-                  onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
-                  rows={4}
-                  className="border-[#D0D0D0] text-[#1A1A1A]"
-                />
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="mb-6 border-[#D0D0D0]">
-            <CardHeader>
-              <CardTitle className="text-[#1A1A1A]">Availability & Caseload</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="availability" className="text-[#4A4A4A]">Availability *</Label>
-                  <select
-                    id="availability"
-                    required
-                    value={formData.availability}
-                    onChange={(e) => setFormData({ ...formData, availability: e.target.value })}
-                    className="w-full border border-[#D0D0D0] rounded-md px-3 py-2 text-[#1A1A1A]"
-                  >
-                    <option value="Full-time">Full-time</option>
-                    <option value="Part-time">Part-time</option>
-                    <option value="On-call">On-call</option>
-                  </select>
-                </div>
-                <div>
-                  <Label htmlFor="maxCaseload" className="text-[#4A4A4A]">Maximum Caseload *</Label>
-                  <Input
-                    id="maxCaseload"
-                    type="number"
-                    required
-                    value={formData.maxCaseload}
-                    onChange={(e) => setFormData({ ...formData, maxCaseload: e.target.value })}
-                    className="border-[#D0D0D0] text-[#1A1A1A]"
-                  />
-                  <p className="text-sm text-[#757575] mt-1">
-                    Currently assigned: {expertStats.activeCases} / {formData.maxCaseload}
-                  </p>
-                </div>
+                  value={formData.availability}
+                  onChange={(e) => setFormData({ ...formData, availability: e.target.value })}
+                  className="w-full border border-[#D0D0D0] rounded-md px-3 py-2 text-[#1A1A1A]"
+                >
+                  <option value="Full-time">Full-time</option>
+                  <option value="Part-time">Part-time</option>
+                  <option value="On-call">On-call</option>
+                </select>
               </div>
             </CardContent>
           </Card>

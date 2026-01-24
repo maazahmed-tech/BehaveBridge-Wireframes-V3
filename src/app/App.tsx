@@ -87,9 +87,8 @@ import EditParent from '@/app/pages/admin/EditParent';
 import AddStudent from '@/app/pages/admin/AddStudent';
 import EditStudent from '@/app/pages/admin/EditStudent';
 import ViewStudent from '@/app/pages/admin/ViewStudent';
-import SystemSettings from '@/app/pages/admin/SystemSettings';
-import Reports from '@/app/pages/admin/Reports';
-import AuditLogs from '@/app/pages/admin/AuditLogs';
+// Removed: SystemSettings, Reports, AuditLogs - these exceed proposal scope
+// Proposal states: "This interface does not control system rules, permissions, reports, or analytics."
 
 // Phase 4G: Admin System Maintenance
 import { ActiveUsers } from '@/app/pages/admin/ActiveUsers';
@@ -102,6 +101,17 @@ import ViewExpertCaseload from '@/app/pages/admin/ViewExpertCaseload';
 import ViewExpertAccount from '@/app/pages/admin/ViewExpertAccount';
 import LinkParentToStudent from '@/app/pages/admin/LinkParentToStudent';
 import ViewParentAccount from '@/app/pages/admin/ViewParentAccount';
+import AssignStudentToTeacher from '@/app/pages/admin/AssignStudentToTeacher';
+import AssignStudentToExpert from '@/app/pages/admin/AssignStudentToExpert';
+import AssignParentToStudent from '@/app/pages/admin/AssignParentToStudent';
+import AssignmentSummary from '@/app/pages/admin/AssignmentSummary';
+
+// Bulk Operations
+import BulkImportStudents from '@/app/pages/admin/BulkImportStudents';
+import BulkImportTeachers from '@/app/pages/admin/BulkImportTeachers';
+import BulkAssignStudentsToTeacher from '@/app/pages/admin/BulkAssignStudentsToTeacher';
+import BulkAssignStudentsToExpert from '@/app/pages/admin/BulkAssignStudentsToExpert';
+import BulkLinkParentsToStudents from '@/app/pages/admin/BulkLinkParentsToStudents';
 
 // Success Screens
 import StudentCreatedSuccess from '@/app/pages/admin/StudentCreatedSuccess';
@@ -195,10 +205,20 @@ export default function App() {
           <Route path="/admin/parents/new" element={<AddParent />} />
           <Route path="/admin/students/new" element={<AddStudent />} />
           <Route path="/admin/students/edit/:id" element={<EditStudent />} />
-          <Route path="/admin/settings" element={<SystemSettings />} />
-          <Route path="/admin/reports" element={<Reports />} />
-          <Route path="/admin/audit-logs" element={<AuditLogs />} />
+          {/* Removed: /admin/settings, /admin/reports, /admin/audit-logs - exceed proposal scope */}
           <Route path="/admin/view-student/:id" element={<ViewStudent />} />
+          <Route path="/admin/students/:id/assign-teacher" element={<AssignStudentToTeacher />} />
+          <Route path="/admin/students/:id/assign-expert" element={<AssignStudentToExpert />} />
+          <Route path="/admin/students/:id/assign-parent" element={<AssignParentToStudent />} />
+          <Route path="/admin/assignments" element={<AssignmentSummary />} />
+
+          {/* Bulk Operations */}
+          <Route path="/admin/students/bulk-import" element={<BulkImportStudents />} />
+          <Route path="/admin/teachers/bulk-import" element={<BulkImportTeachers />} />
+          <Route path="/admin/students/bulk-assign-teacher" element={<BulkAssignStudentsToTeacher />} />
+          <Route path="/admin/students/bulk-assign-expert" element={<BulkAssignStudentsToExpert />} />
+          <Route path="/admin/parents/bulk-link" element={<BulkLinkParentsToStudents />} />
+
           <Route path="/admin/edit-expert/:id" element={<EditExpert />} />
           <Route path="/admin/edit-parent/:id" element={<EditParent />} />
 

@@ -3,12 +3,15 @@ import { useNavigate } from 'react-router-dom';
 import { AdminLayout } from '@/app/components/AdminLayout';
 import { Button } from '@/app/components/ui/button';
 import { Input } from '@/app/components/ui/input';
+import { Label } from '@/app/components/ui/label';
 import { Card, CardContent } from '@/app/components/ui/card';
 import { Badge } from '@/app/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/app/components/ui/table';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/app/components/ui/dropdown-menu';
-import { Search, Plus, MoreVertical, UserCheck, UserX } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/app/components/ui/dialog';
+import { Search, Plus, MoreVertical, UserCheck, UserX, Upload, Eye, EyeOff } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/app/components/ui/select';
+import { toast } from 'sonner';
 
 interface Teacher {
   id: string;
@@ -23,6 +26,18 @@ export default function TeacherManagement() {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
+
+  // Reset Password Modal State
+  const [resetPasswordOpen, setResetPasswordOpen] = useState(false);
+  const [selectedTeacher, setSelectedTeacher] = useState<Teacher | null>(null);
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  // Deactivate Modal State
+  const [deactivateOpen, setDeactivateOpen] = useState(false);
+  const [teacherToDeactivate, setTeacherToDeactivate] = useState<Teacher | null>(null);
 
   const teachers: Teacher[] = [
     {
@@ -76,12 +91,50 @@ export default function TeacherManagement() {
   ];
 
   const filteredTeachers = teachers.filter(teacher => {
-    const matchesSearch = 
+    const matchesSearch =
       teacher.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       teacher.email.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesStatus = statusFilter === 'all' || teacher.status.toLowerCase() === statusFilter;
     return matchesSearch && matchesStatus;
   });
+
+  const handleResetPassword = (teacher: Teacher) => {
+    setSelectedTeacher(teacher);
+    setNewPassword('');
+    setConfirmPassword('');
+    setShowPassword(false);
+    setShowConfirmPassword(false);
+    setResetPasswordOpen(true);
+  };
+
+  const handleSubmitResetPassword = () => {
+    if (newPassword.length < 8) {
+      toast.error('Password must be at least 8 characters');
+      return;
+    }
+    if (newPassword !== confirmPassword) {
+      toast.error('Passwords do not match');
+      return;
+    }
+    toast.success(`Password has been reset for ${selectedTeacher?.name}`);
+    setResetPasswordOpen(false);
+    setSelectedTeacher(null);
+    setNewPassword('');
+    setConfirmPassword('');
+  };
+
+  const handleDeactivate = (teacher: Teacher) => {
+    setTeacherToDeactivate(teacher);
+    setDeactivateOpen(true);
+  };
+
+  const handleConfirmDeactivate = () => {
+    if (teacherToDeactivate) {
+      toast.success(`Teacher ${teacherToDeactivate.status === 'Active' ? 'deactivated' : 'reactivated'} successfully`);
+      setDeactivateOpen(false);
+      setTeacherToDeactivate(null);
+    }
+  };
 
   return (
     <AdminLayout>
@@ -153,13 +206,23 @@ export default function TeacherManagement() {
               <SelectItem value="inactive">Inactive</SelectItem>
             </SelectContent>
           </Select>
-          <Button
-            onClick={() => navigate('/admin/teachers/new')}
-            className="bg-[#333333] hover:bg-[#4A4A4A]"
-          >
-            <Plus className="h-4 w-4 mr-2" />
-            Add Teacher
-          </Button>
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              onClick={() => navigate('/admin/teachers/bulk-import')}
+              className="border-[#D0D0D0]"
+            >
+              <Upload className="h-4 w-4 mr-2" />
+              Bulk Import
+            </Button>
+            <Button
+              onClick={() => navigate('/admin/teachers/new')}
+              className="bg-[#333333] hover:bg-[#4A4A4A]"
+            >
+              <Plus className="h-4 w-4 mr-2" />
+              Add Teacher
+            </Button>
+          </div>
         </div>
 
         {/* Teachers Table */}
@@ -200,16 +263,10 @@ export default function TeacherManagement() {
                           <DropdownMenuItem onClick={() => navigate(`/admin/teachers/${teacher.id}/students`)}>
                             Assign Students
                           </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => alert('Reset password email sent')}>
+                          <DropdownMenuItem onClick={() => handleResetPassword(teacher)}>
                             Reset Password
                           </DropdownMenuItem>
-                          <DropdownMenuItem
-                            onClick={() => {
-                              if (confirm(`${teacher.status === 'Active' ? 'Deactivate' : 'Reactivate'} ${teacher.name}?`)) {
-                                alert(`Teacher ${teacher.status === 'Active' ? 'deactivated' : 'reactivated'} successfully`);
-                              }
-                            }}
-                          >
+                          <DropdownMenuItem onClick={() => handleDeactivate(teacher)}>
                             {teacher.status === 'Active' ? 'Deactivate' : 'Reactivate'}
                           </DropdownMenuItem>
                         </DropdownMenuContent>
@@ -230,6 +287,111 @@ export default function TeacherManagement() {
           </Card>
         )}
       </div>
+
+      {/* Reset Password Modal */}
+      <Dialog open={resetPasswordOpen} onOpenChange={setResetPasswordOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-[#1A1A1A]">Reset Password</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="bg-[#F5F5F5] p-3 rounded-lg">
+              <p className="text-sm text-[#757575]">Account</p>
+              <p className="text-[#1A1A1A] font-medium">{selectedTeacher?.name}</p>
+              <p className="text-sm text-[#757575]">{selectedTeacher?.email}</p>
+            </div>
+            <div>
+              <Label htmlFor="newPassword" className="text-[#4A4A4A]">New Password</Label>
+              <div className="relative mt-1">
+                <Input
+                  id="newPassword"
+                  type={showPassword ? 'text' : 'password'}
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  className="border-[#D0D0D0] pr-10"
+                  placeholder="Enter new password"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-[#757575] hover:text-[#1A1A1A]"
+                >
+                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
+              </div>
+              <p className="text-xs text-[#757575] mt-1">Minimum 8 characters</p>
+            </div>
+            <div>
+              <Label htmlFor="confirmPassword" className="text-[#4A4A4A]">Confirm Password</Label>
+              <div className="relative mt-1">
+                <Input
+                  id="confirmPassword"
+                  type={showConfirmPassword ? 'text' : 'password'}
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  className="border-[#D0D0D0] pr-10"
+                  placeholder="Confirm new password"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-[#757575] hover:text-[#1A1A1A]"
+                >
+                  {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
+              </div>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setResetPasswordOpen(false)}
+              className="border-[#9E9E9E] text-[#333333]"
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleSubmitResetPassword}
+              className="bg-[#333333] hover:bg-[#1A1A1A] text-white"
+            >
+              Reset Password
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Deactivate/Reactivate Modal */}
+      <Dialog open={deactivateOpen} onOpenChange={setDeactivateOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-[#1A1A1A]">
+              {teacherToDeactivate?.status === 'Active' ? 'Deactivate' : 'Reactivate'} Account
+            </DialogTitle>
+          </DialogHeader>
+          <div className="py-4">
+            <p className="text-[#4A4A4A]">
+              {teacherToDeactivate?.status === 'Active'
+                ? `Are you sure you want to deactivate ${teacherToDeactivate?.name}'s account? They will no longer be able to access the teacher portal.`
+                : `Are you sure you want to reactivate ${teacherToDeactivate?.name}'s account? They will regain access to the teacher portal.`}
+            </p>
+          </div>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setDeactivateOpen(false)}
+              className="border-[#9E9E9E] text-[#333333]"
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleConfirmDeactivate}
+              className="bg-[#333333] hover:bg-[#1A1A1A] text-white"
+            >
+              {teacherToDeactivate?.status === 'Active' ? 'Deactivate' : 'Reactivate'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </AdminLayout>
   );
 }

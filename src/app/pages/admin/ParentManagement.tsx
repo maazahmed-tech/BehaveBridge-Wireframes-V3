@@ -3,12 +3,15 @@ import { useNavigate } from 'react-router-dom';
 import { AdminLayout } from '@/app/components/AdminLayout';
 import { Button } from '@/app/components/ui/button';
 import { Input } from '@/app/components/ui/input';
+import { Label } from '@/app/components/ui/label';
 import { Card, CardContent } from '@/app/components/ui/card';
 import { Badge } from '@/app/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/app/components/ui/table';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/app/components/ui/dropdown-menu';
-import { Search, Plus, MoreVertical, UserCheck, UserX, Users, MailCheck } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/app/components/ui/dialog';
+import { Search, Plus, MoreVertical, UserCheck, UserX, Users, MailCheck, Link2, Eye, EyeOff } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/app/components/ui/select';
+import { toast } from 'sonner';
 
 interface Parent {
   id: string;
@@ -25,6 +28,18 @@ export default function ParentManagement() {
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [activationFilter, setActivationFilter] = useState<string>('all');
+
+  // Reset Password Modal State
+  const [resetPasswordOpen, setResetPasswordOpen] = useState(false);
+  const [selectedParent, setSelectedParent] = useState<Parent | null>(null);
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  // Deactivate Modal State
+  const [deactivateOpen, setDeactivateOpen] = useState(false);
+  const [parentToDeactivate, setParentToDeactivate] = useState<Parent | null>(null);
 
   const parents: Parent[] = [
     {
@@ -84,12 +99,12 @@ export default function ParentManagement() {
   ];
 
   const filteredParents = parents.filter(parent => {
-    const matchesSearch = 
+    const matchesSearch =
       parent.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       parent.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
       parent.linkedStudents.some(s => s.toLowerCase().includes(searchQuery.toLowerCase()));
     const matchesStatus = statusFilter === 'all' || parent.status.toLowerCase() === statusFilter;
-    const matchesActivation = 
+    const matchesActivation =
       activationFilter === 'all' ||
       (activationFilter === 'activated' && parent.isActivated) ||
       (activationFilter === 'pending' && !parent.isActivated);
@@ -98,6 +113,44 @@ export default function ParentManagement() {
 
   const activatedCount = parents.filter(p => p.isActivated).length;
   const pendingCount = parents.filter(p => !p.isActivated).length;
+
+  const handleResetPassword = (parent: Parent) => {
+    setSelectedParent(parent);
+    setNewPassword('');
+    setConfirmPassword('');
+    setShowPassword(false);
+    setShowConfirmPassword(false);
+    setResetPasswordOpen(true);
+  };
+
+  const handleSubmitResetPassword = () => {
+    if (newPassword.length < 8) {
+      toast.error('Password must be at least 8 characters');
+      return;
+    }
+    if (newPassword !== confirmPassword) {
+      toast.error('Passwords do not match');
+      return;
+    }
+    toast.success(`Password has been reset for ${selectedParent?.name}`);
+    setResetPasswordOpen(false);
+    setSelectedParent(null);
+    setNewPassword('');
+    setConfirmPassword('');
+  };
+
+  const handleDeactivate = (parent: Parent) => {
+    setParentToDeactivate(parent);
+    setDeactivateOpen(true);
+  };
+
+  const handleConfirmDeactivate = () => {
+    if (parentToDeactivate) {
+      toast.success(`Parent account ${parentToDeactivate.status === 'Active' ? 'deactivated' : 'reactivated'} successfully`);
+      setDeactivateOpen(false);
+      setParentToDeactivate(null);
+    }
+  };
 
   return (
     <AdminLayout>
@@ -190,13 +243,23 @@ export default function ParentManagement() {
               <SelectItem value="pending">Pending Activation</SelectItem>
             </SelectContent>
           </Select>
-          <Button
-            onClick={() => navigate('/admin/parents/new')}
-            className="bg-[#333333] hover:bg-[#4A4A4A]"
-          >
-            <Plus className="h-4 w-4 mr-2" />
-            Add Parent
-          </Button>
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              onClick={() => navigate('/admin/parents/bulk-link')}
+              className="border-[#D0D0D0]"
+            >
+              <Link2 className="h-4 w-4 mr-2" />
+              Bulk Link
+            </Button>
+            <Button
+              onClick={() => navigate('/admin/parents/new')}
+              className="bg-[#333333] hover:bg-[#4A4A4A]"
+            >
+              <Plus className="h-4 w-4 mr-2" />
+              Add Parent
+            </Button>
+          </div>
         </div>
 
         {/* Parents Table */}
@@ -280,16 +343,10 @@ export default function ParentManagement() {
                               Resend Activation
                             </DropdownMenuItem>
                           )}
-                          <DropdownMenuItem onClick={() => alert('Reset password email sent')}>
+                          <DropdownMenuItem onClick={() => handleResetPassword(parent)}>
                             Reset Password
                           </DropdownMenuItem>
-                          <DropdownMenuItem
-                            onClick={() => {
-                              if (confirm(`${parent.status === 'Active' ? 'Deactivate' : 'Reactivate'} ${parent.name}'s account?`)) {
-                                alert(`Parent account ${parent.status === 'Active' ? 'deactivated' : 'reactivated'} successfully`);
-                              }
-                            }}
-                          >
+                          <DropdownMenuItem onClick={() => handleDeactivate(parent)}>
                             {parent.status === 'Active' ? 'Deactivate' : 'Reactivate'}
                           </DropdownMenuItem>
                         </DropdownMenuContent>
@@ -321,6 +378,111 @@ export default function ParentManagement() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Reset Password Modal */}
+      <Dialog open={resetPasswordOpen} onOpenChange={setResetPasswordOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-[#1A1A1A]">Reset Password</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="bg-[#F5F5F5] p-3 rounded-lg">
+              <p className="text-sm text-[#757575]">Account</p>
+              <p className="text-[#1A1A1A] font-medium">{selectedParent?.name}</p>
+              <p className="text-sm text-[#757575]">{selectedParent?.email}</p>
+            </div>
+            <div>
+              <Label htmlFor="newPassword" className="text-[#4A4A4A]">New Password</Label>
+              <div className="relative mt-1">
+                <Input
+                  id="newPassword"
+                  type={showPassword ? 'text' : 'password'}
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  className="border-[#D0D0D0] pr-10"
+                  placeholder="Enter new password"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-[#757575] hover:text-[#1A1A1A]"
+                >
+                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
+              </div>
+              <p className="text-xs text-[#757575] mt-1">Minimum 8 characters</p>
+            </div>
+            <div>
+              <Label htmlFor="confirmPassword" className="text-[#4A4A4A]">Confirm Password</Label>
+              <div className="relative mt-1">
+                <Input
+                  id="confirmPassword"
+                  type={showConfirmPassword ? 'text' : 'password'}
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  className="border-[#D0D0D0] pr-10"
+                  placeholder="Confirm new password"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-[#757575] hover:text-[#1A1A1A]"
+                >
+                  {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
+              </div>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setResetPasswordOpen(false)}
+              className="border-[#9E9E9E] text-[#333333]"
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleSubmitResetPassword}
+              className="bg-[#333333] hover:bg-[#1A1A1A] text-white"
+            >
+              Reset Password
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Deactivate/Reactivate Modal */}
+      <Dialog open={deactivateOpen} onOpenChange={setDeactivateOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-[#1A1A1A]">
+              {parentToDeactivate?.status === 'Active' ? 'Deactivate' : 'Reactivate'} Account
+            </DialogTitle>
+          </DialogHeader>
+          <div className="py-4">
+            <p className="text-[#4A4A4A]">
+              {parentToDeactivate?.status === 'Active'
+                ? `Are you sure you want to deactivate ${parentToDeactivate?.name}'s account? They will no longer be able to access the parent portal.`
+                : `Are you sure you want to reactivate ${parentToDeactivate?.name}'s account? They will regain access to the parent portal.`}
+            </p>
+          </div>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setDeactivateOpen(false)}
+              className="border-[#9E9E9E] text-[#333333]"
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleConfirmDeactivate}
+              className="bg-[#333333] hover:bg-[#1A1A1A] text-white"
+            >
+              {parentToDeactivate?.status === 'Active' ? 'Deactivate' : 'Reactivate'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </AdminLayout>
   );
 }

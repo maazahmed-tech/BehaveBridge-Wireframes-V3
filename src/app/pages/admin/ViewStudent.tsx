@@ -1,9 +1,11 @@
+import { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { AdminLayout } from '@/app/components/AdminLayout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/app/components/ui/card';
 import { Button } from '@/app/components/ui/button';
 import { Badge } from '@/app/components/ui/badge';
-import { 
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/app/components/ui/dialog';
+import {
   ArrowLeft,
   User,
   Calendar,
@@ -12,11 +14,18 @@ import {
   AlertCircle,
   TrendingUp,
   FileText,
-  Edit
+  Edit,
+  Users,
+  X
 } from 'lucide-react';
+import { toast } from 'sonner';
 
 export default function ViewStudent() {
   const { id } = useParams();
+
+  // Unlink Modal State
+  const [unlinkOpen, setUnlinkOpen] = useState(false);
+  const [itemToUnlink, setItemToUnlink] = useState<{ id: string; name: string; type: 'teacher' | 'expert' | 'parent' } | null>(null);
 
   const student = {
     id: 'STU-123',
@@ -67,6 +76,49 @@ export default function ViewStudent() {
     { id: 'ESC-2026-038', date: 'Jan 12, 2026', type: 'Academic Avoidance', severity: 'Medium' },
     { id: 'ESC-2026-034', date: 'Jan 10, 2026', type: 'Verbal Outburst', severity: 'High' }
   ];
+
+  // Assigned personnel
+  const assignedTeachers = [
+    { id: 'T-001', name: 'Mrs. Maria Johnson', role: 'Primary Teacher', assignedDate: 'Aug 20, 2021' },
+    { id: 'T-002', name: 'Mr. James Wilson', role: 'Math Teacher', assignedDate: 'Sep 5, 2024' },
+  ];
+
+  const assignedExperts = [
+    { id: 'E-001', name: 'Dr. Sarah Williams', role: 'Lead Behavioral Specialist', assignedDate: 'Oct 15, 2024' },
+  ];
+
+  const linkedParents = [
+    { id: 'P-001', name: 'Lisa Thompson', relationship: 'Mother', linkedDate: 'Aug 20, 2021' },
+    { id: 'P-002', name: 'Robert Thompson', relationship: 'Father', linkedDate: 'Aug 20, 2021' },
+  ];
+
+  const handleUnlink = (item: { id: string; name: string }, type: 'teacher' | 'expert' | 'parent') => {
+    setItemToUnlink({ ...item, type });
+    setUnlinkOpen(true);
+  };
+
+  const handleConfirmUnlink = () => {
+    if (itemToUnlink) {
+      const typeLabel = itemToUnlink.type === 'teacher' ? 'Teacher' : itemToUnlink.type === 'expert' ? 'Expert' : 'Parent';
+      toast.success(`${typeLabel} ${itemToUnlink.name} has been unlinked from ${student.fullName}`);
+      setUnlinkOpen(false);
+      setItemToUnlink(null);
+    }
+  };
+
+  const getUnlinkMessage = () => {
+    if (!itemToUnlink) return '';
+    switch (itemToUnlink.type) {
+      case 'teacher':
+        return 'This teacher will no longer be assigned to this student.';
+      case 'expert':
+        return 'This behavioral expert will no longer be assigned to this student.';
+      case 'parent':
+        return 'This parent will no longer have access to this student\'s information.';
+      default:
+        return '';
+    }
+  };
 
   return (
     <AdminLayout>
@@ -300,8 +352,8 @@ export default function ViewStudent() {
                         {incident.date} • {incident.id}
                       </div>
                     </div>
-                    <Badge 
-                      variant="outline" 
+                    <Badge
+                      variant="outline"
                       className={
                         incident.severity === 'High'
                           ? 'border-[#333333] text-[#333333]'
@@ -322,7 +374,175 @@ export default function ViewStudent() {
             </CardContent>
           </Card>
         </div>
+
+        {/* Assignments Section */}
+        <Card className="mt-6 border-[#D0D0D0]">
+          <CardHeader>
+            <CardTitle className="text-lg text-[#1A1A1A] flex items-center gap-2">
+              <Users className="w-5 h-5" />
+              Assignments
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {/* Assigned Teachers */}
+            <div className="mb-6">
+              <h3 className="text-sm font-medium text-[#4A4A4A] mb-3">Assigned Teachers</h3>
+              {assignedTeachers.length === 0 ? (
+                <p className="text-sm text-[#757575]">No teachers assigned</p>
+              ) : (
+                <div className="bg-white border border-[#D0D0D0] rounded-lg overflow-hidden">
+                  <table className="w-full">
+                    <thead className="bg-[#F5F5F5] border-b border-[#D0D0D0]">
+                      <tr>
+                        <th className="text-left p-3 text-sm font-medium text-[#4A4A4A]">Name</th>
+                        <th className="text-left p-3 text-sm font-medium text-[#4A4A4A]">Role</th>
+                        <th className="text-left p-3 text-sm font-medium text-[#4A4A4A]">Assigned Date</th>
+                        <th className="text-left p-3 text-sm font-medium text-[#4A4A4A]">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {assignedTeachers.map((teacher, index) => (
+                        <tr key={teacher.id} className={`border-b border-[#E0E0E0] ${index % 2 === 0 ? 'bg-white' : 'bg-[#FAFAFA]'}`}>
+                          <td className="p-3 text-sm text-[#1A1A1A] font-medium">{teacher.name}</td>
+                          <td className="p-3 text-sm text-[#4A4A4A]">{teacher.role}</td>
+                          <td className="p-3 text-sm text-[#757575]">{teacher.assignedDate}</td>
+                          <td className="p-3">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleUnlink({ id: teacher.id, name: teacher.name }, 'teacher')}
+                              className="text-[#757575] hover:text-[#333333] hover:bg-[#F5F5F5]"
+                            >
+                              <X className="w-4 h-4 mr-1" />
+                              Unlink
+                            </Button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
+
+            {/* Assigned Experts */}
+            <div className="mb-6">
+              <h3 className="text-sm font-medium text-[#4A4A4A] mb-3">Assigned Behavioral Experts</h3>
+              {assignedExperts.length === 0 ? (
+                <p className="text-sm text-[#757575]">No experts assigned</p>
+              ) : (
+                <div className="bg-white border border-[#D0D0D0] rounded-lg overflow-hidden">
+                  <table className="w-full">
+                    <thead className="bg-[#F5F5F5] border-b border-[#D0D0D0]">
+                      <tr>
+                        <th className="text-left p-3 text-sm font-medium text-[#4A4A4A]">Name</th>
+                        <th className="text-left p-3 text-sm font-medium text-[#4A4A4A]">Role</th>
+                        <th className="text-left p-3 text-sm font-medium text-[#4A4A4A]">Assigned Date</th>
+                        <th className="text-left p-3 text-sm font-medium text-[#4A4A4A]">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {assignedExperts.map((expert, index) => (
+                        <tr key={expert.id} className={`border-b border-[#E0E0E0] ${index % 2 === 0 ? 'bg-white' : 'bg-[#FAFAFA]'}`}>
+                          <td className="p-3 text-sm text-[#1A1A1A] font-medium">{expert.name}</td>
+                          <td className="p-3 text-sm text-[#4A4A4A]">{expert.role}</td>
+                          <td className="p-3 text-sm text-[#757575]">{expert.assignedDate}</td>
+                          <td className="p-3">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleUnlink({ id: expert.id, name: expert.name }, 'expert')}
+                              className="text-[#757575] hover:text-[#333333] hover:bg-[#F5F5F5]"
+                            >
+                              <X className="w-4 h-4 mr-1" />
+                              Unlink
+                            </Button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
+
+            {/* Linked Parents */}
+            <div>
+              <h3 className="text-sm font-medium text-[#4A4A4A] mb-3">Linked Parents/Guardians</h3>
+              {linkedParents.length === 0 ? (
+                <p className="text-sm text-[#757575]">No parents linked</p>
+              ) : (
+                <div className="bg-white border border-[#D0D0D0] rounded-lg overflow-hidden">
+                  <table className="w-full">
+                    <thead className="bg-[#F5F5F5] border-b border-[#D0D0D0]">
+                      <tr>
+                        <th className="text-left p-3 text-sm font-medium text-[#4A4A4A]">Name</th>
+                        <th className="text-left p-3 text-sm font-medium text-[#4A4A4A]">Relationship</th>
+                        <th className="text-left p-3 text-sm font-medium text-[#4A4A4A]">Linked Date</th>
+                        <th className="text-left p-3 text-sm font-medium text-[#4A4A4A]">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {linkedParents.map((parent, index) => (
+                        <tr key={parent.id} className={`border-b border-[#E0E0E0] ${index % 2 === 0 ? 'bg-white' : 'bg-[#FAFAFA]'}`}>
+                          <td className="p-3 text-sm text-[#1A1A1A] font-medium">{parent.name}</td>
+                          <td className="p-3 text-sm text-[#4A4A4A]">{parent.relationship}</td>
+                          <td className="p-3 text-sm text-[#757575]">{parent.linkedDate}</td>
+                          <td className="p-3">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleUnlink({ id: parent.id, name: parent.name }, 'parent')}
+                              className="text-[#757575] hover:text-[#333333] hover:bg-[#F5F5F5]"
+                            >
+                              <X className="w-4 h-4 mr-1" />
+                              Unlink
+                            </Button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
+          </CardContent>
+        </Card>
       </div>
+
+      {/* Unlink Confirmation Modal */}
+      <Dialog open={unlinkOpen} onOpenChange={setUnlinkOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-[#1A1A1A]">
+              Unlink {itemToUnlink?.type === 'teacher' ? 'Teacher' : itemToUnlink?.type === 'expert' ? 'Expert' : 'Parent'}
+            </DialogTitle>
+          </DialogHeader>
+          <div className="py-4">
+            <p className="text-[#4A4A4A]">
+              Are you sure you want to unlink <span className="font-medium">{itemToUnlink?.name}</span> from <span className="font-medium">{student.fullName}</span>?
+            </p>
+            <p className="text-sm text-[#757575] mt-2">
+              {getUnlinkMessage()}
+            </p>
+          </div>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setUnlinkOpen(false)}
+              className="border-[#9E9E9E] text-[#333333]"
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleConfirmUnlink}
+              className="bg-[#333333] hover:bg-[#1A1A1A] text-white"
+            >
+              Unlink
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </AdminLayout>
   );
 }

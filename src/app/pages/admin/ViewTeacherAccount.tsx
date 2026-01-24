@@ -1,13 +1,21 @@
-import { useNavigate, useParams } from 'react-router-dom';
+import { useState } from 'react';
+import { useNavigate, useParams, Link } from 'react-router-dom';
+import { AdminLayout } from '@/app/components/AdminLayout';
 import { Card } from '@/app/components/ui/card';
 import { Button } from '@/app/components/ui/button';
 import { Badge } from '@/app/components/ui/badge';
-import { Link } from 'react-router-dom';
-import { User, Mail, Phone, Calendar, FileText, CheckCircle2, XCircle } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/app/components/ui/dialog';
+import { User, Mail, ArrowLeft, BookOpen, X } from 'lucide-react';
+import { STUDENTS } from '@/data/constants';
+import { toast } from 'sonner';
 
 export default function ViewTeacherAccount() {
   const { id } = useParams();
   const navigate = useNavigate();
+
+  // Unlink Modal State
+  const [unlinkOpen, setUnlinkOpen] = useState(false);
+  const [studentToUnlink, setStudentToUnlink] = useState<{ id: string; name: string } | null>(null);
 
   // Mock data
   const teacher = {
@@ -18,12 +26,32 @@ export default function ViewTeacherAccount() {
     role: 'Classroom Teacher',
   };
 
+  // Get assigned students
+  const assignedStudents = STUDENTS.slice(0, 5).map((student) => ({
+    ...student,
+  }));
+
+  const handleUnlink = (student: { id: string; name: string }) => {
+    setStudentToUnlink(student);
+    setUnlinkOpen(true);
+  };
+
+  const handleConfirmUnlink = () => {
+    if (studentToUnlink) {
+      toast.success(`${studentToUnlink.name} has been unlinked from ${teacher.name}`);
+      setUnlinkOpen(false);
+      setStudentToUnlink(null);
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-[#F5F5F5]">
-      <header className="bg-white border-b border-[#D0D0D0] px-8 py-4 mb-8">
-        <div>
-          <Link to="/admin/teachers" className="text-[#4A4A4A] hover:text-[#1A1A1A] text-sm mb-2 block">
-            ← Back to Teacher Management
+    <AdminLayout>
+      <div className="p-6 max-w-5xl">
+        {/* Header */}
+        <div className="mb-6">
+          <Link to="/admin/teachers" className="inline-flex items-center gap-2 text-[#4A4A4A] hover:text-[#1A1A1A] text-sm mb-4">
+            <ArrowLeft className="w-4 h-4" />
+            Back to Teacher Management
           </Link>
           <div className="flex items-start justify-between">
             <div>
@@ -37,9 +65,7 @@ export default function ViewTeacherAccount() {
             </Badge>
           </div>
         </div>
-      </header>
 
-      <div className="px-8 pb-8 max-w-5xl">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
           {/* Account Information */}
           <Card className="border-[#D0D0D0] p-6">
@@ -78,6 +104,66 @@ export default function ViewTeacherAccount() {
           </Card>
         </div>
 
+        {/* Assigned Students */}
+        <Card className="border-[#D0D0D0] p-6 mb-6">
+          <div className="flex items-center gap-3 mb-4">
+            <BookOpen className="w-5 h-5 text-[#333333]" />
+            <h2 className="text-lg font-medium text-[#1A1A1A]">Assigned Students</h2>
+          </div>
+
+          {assignedStudents.length === 0 ? (
+            <div className="text-center py-12">
+              <p className="text-[#757575]">No students currently assigned</p>
+            </div>
+          ) : (
+            <div className="bg-white border border-[#D0D0D0] rounded-lg overflow-hidden">
+              <table className="w-full">
+                <thead className="bg-[#F5F5F5] border-b border-[#D0D0D0]">
+                  <tr>
+                    <th className="text-left p-4 text-sm font-medium text-[#4A4A4A]">Student Name</th>
+                    <th className="text-left p-4 text-sm font-medium text-[#4A4A4A]">Student ID</th>
+                    <th className="text-left p-4 text-sm font-medium text-[#4A4A4A]">Grade</th>
+                    <th className="text-left p-4 text-sm font-medium text-[#4A4A4A]">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {assignedStudents.map((student, index) => (
+                    <tr
+                      key={student.id}
+                      className={`border-b border-[#E0E0E0] hover:bg-[#FAFAFA] ${
+                        index % 2 === 0 ? 'bg-white' : 'bg-[#FAFAFA]'
+                      }`}
+                    >
+                      <td
+                        className="p-4 text-[#1A1A1A] font-medium cursor-pointer hover:underline"
+                        onClick={() => navigate(`/admin/students/${student.id}`)}
+                      >
+                        {student.name}
+                      </td>
+                      <td className="p-4 text-[#4A4A4A]">{student.id}</td>
+                      <td className="p-4 text-[#4A4A4A]">Grade {student.grade}</td>
+                      <td className="p-4">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleUnlink({ id: student.id, name: student.name });
+                          }}
+                          className="text-[#757575] hover:text-[#333333] hover:bg-[#F5F5F5]"
+                        >
+                          <X className="w-4 h-4 mr-1" />
+                          Unlink
+                        </Button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </Card>
+
         {/* Actions */}
         <div className="flex justify-end gap-4">
           <Button
@@ -102,6 +188,38 @@ export default function ViewTeacherAccount() {
           </Button>
         </div>
       </div>
-    </div>
+
+      {/* Unlink Confirmation Modal */}
+      <Dialog open={unlinkOpen} onOpenChange={setUnlinkOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-[#1A1A1A]">Unlink Student</DialogTitle>
+          </DialogHeader>
+          <div className="py-4">
+            <p className="text-[#4A4A4A]">
+              Are you sure you want to unlink <span className="font-medium">{studentToUnlink?.name}</span> from <span className="font-medium">{teacher.name}</span>?
+            </p>
+            <p className="text-sm text-[#757575] mt-2">
+              This student will no longer be assigned to this teacher.
+            </p>
+          </div>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setUnlinkOpen(false)}
+              className="border-[#9E9E9E] text-[#333333]"
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleConfirmUnlink}
+              className="bg-[#333333] hover:bg-[#1A1A1A] text-white"
+            >
+              Unlink Student
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </AdminLayout>
   );
 }

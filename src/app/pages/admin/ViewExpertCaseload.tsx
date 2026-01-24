@@ -1,14 +1,21 @@
-import { useNavigate, useParams } from 'react-router-dom';
+import { useState } from 'react';
+import { useNavigate, useParams, Link } from 'react-router-dom';
+import { AdminLayout } from '@/app/components/AdminLayout';
 import { Card } from '@/app/components/ui/card';
 import { Button } from '@/app/components/ui/button';
 import { Badge } from '@/app/components/ui/badge';
-import { Link } from 'react-router-dom';
-import { Users, User, Mail, FileText, Calendar, BookOpen } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/app/components/ui/dialog';
+import { User, BookOpen, ArrowLeft, X } from 'lucide-react';
 import { STUDENTS } from '@/data/constants';
+import { toast } from 'sonner';
 
 export default function ViewExpertCaseload() {
   const { id } = useParams();
   const navigate = useNavigate();
+
+  // Unlink Modal State
+  const [unlinkOpen, setUnlinkOpen] = useState(false);
+  const [studentToUnlink, setStudentToUnlink] = useState<{ id: string; name: string } | null>(null);
 
   // Mock data
   const expert = {
@@ -19,8 +26,6 @@ export default function ViewExpertCaseload() {
     expertId: 'BE-2024-001',
     status: 'Active',
     specialization: 'Behavioral Psychology',
-    caseloadLimit: 15,
-    currentCaseload: 8,
     joinedDate: 'August 15, 2024',
   };
 
@@ -37,95 +42,55 @@ export default function ViewExpertCaseload() {
     priority: index < 2 ? 'High' : index < 5 ? 'Medium' : 'Low',
   }));
 
+  const handleUnlink = (student: { id: string; name: string }) => {
+    setStudentToUnlink(student);
+    setUnlinkOpen(true);
+  };
+
+  const handleConfirmUnlink = () => {
+    if (studentToUnlink) {
+      toast.success(`${studentToUnlink.name} has been unlinked from ${expert.name}`);
+      setUnlinkOpen(false);
+      setStudentToUnlink(null);
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-[#F5F5F5]">
-      <header className="bg-white border-b border-[#D0D0D0] px-8 py-4 mb-8">
-        <div>
-          <Link to="/admin/experts" className="text-[#4A4A4A] hover:text-[#1A1A1A] text-sm mb-2 block">
-            ← Back to Expert Management
+    <AdminLayout>
+      <div className="p-6 max-w-6xl">
+        {/* Header */}
+        <div className="mb-6">
+          <Link to="/admin/experts" className="inline-flex items-center gap-2 text-[#4A4A4A] hover:text-[#1A1A1A] text-sm mb-4">
+            <ArrowLeft className="w-4 h-4" />
+            Back to Expert Management
           </Link>
-          <div className="flex items-start justify-between">
-            <div>
-              <h1 className="text-2xl text-[#1A1A1A]">{expert.name} - Caseload</h1>
-              <p className="text-sm text-[#757575] mt-1">Managing assigned students and cases</p>
-            </div>
-            <Badge className="bg-[#333333] text-white">
-              {expert.currentCaseload} / {expert.caseloadLimit} Students
-            </Badge>
+          <div>
+            <h1 className="text-2xl text-[#1A1A1A]">{expert.name} - Caseload</h1>
+            <p className="text-sm text-[#757575] mt-1">Managing assigned students and cases</p>
           </div>
         </div>
-      </header>
 
-      <div className="px-8 pb-8 max-w-6xl">
         {/* Expert Summary */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-          <Card className="border-[#D0D0D0] p-6">
-            <div className="flex items-center gap-3 mb-3">
-              <User className="w-5 h-5 text-[#333333]" />
-              <h2 className="text-sm font-medium text-[#757575]">Expert Information</h2>
-            </div>
-            <p className="text-2xl font-medium text-[#1A1A1A] mb-1">{expert.name}</p>
-            <p className="text-sm text-[#757575]">{expert.specialization}</p>
-            <p className="text-sm text-[#757575] mt-2">{expert.expertId}</p>
-          </Card>
-
-          <Card className="border-[#D0D0D0] p-6">
-            <div className="flex items-center gap-3 mb-3">
-              <Users className="w-5 h-5 text-[#333333]" />
-              <h2 className="text-sm font-medium text-[#757575]">Caseload Status</h2>
-            </div>
-            <p className="text-2xl font-medium text-[#1A1A1A] mb-1">{expert.currentCaseload} Students</p>
-            <div className="mt-3">
-              <div className="flex justify-between text-xs text-[#757575] mb-1">
-                <span>Capacity</span>
-                <span>{Math.round((expert.currentCaseload / expert.caseloadLimit) * 100)}%</span>
-              </div>
-              <div className="w-full h-2 bg-[#E0E0E0] rounded-full overflow-hidden">
-                <div
-                  className="h-full bg-[#333333]"
-                  style={{ width: `${(expert.currentCaseload / expert.caseloadLimit) * 100}%` }}
-                />
-              </div>
-            </div>
-          </Card>
-
-          <Card className="border-[#D0D0D0] p-6">
-            <div className="flex items-center gap-3 mb-3">
-              <FileText className="w-5 h-5 text-[#333333]" />
-              <h2 className="text-sm font-medium text-[#757575]">Available Capacity</h2>
-            </div>
-            <p className="text-2xl font-medium text-[#1A1A1A] mb-1">
-              {expert.caseloadLimit - expert.currentCaseload} Slots
-            </p>
-            <p className="text-sm text-[#757575]">Can accept more students</p>
-          </Card>
-        </div>
+        <Card className="border-[#D0D0D0] p-6 mb-6">
+          <div className="flex items-center gap-3 mb-3">
+            <User className="w-5 h-5 text-[#333333]" />
+            <h2 className="text-sm font-medium text-[#757575]">Expert Information</h2>
+          </div>
+          <p className="text-2xl font-medium text-[#1A1A1A] mb-1">{expert.name}</p>
+          <p className="text-sm text-[#757575]">{expert.specialization}</p>
+          <p className="text-sm text-[#757575] mt-2">{expert.expertId}</p>
+        </Card>
 
         {/* Assigned Students */}
         <Card className="border-[#D0D0D0] p-6 mb-6">
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-3">
-              <BookOpen className="w-5 h-5 text-[#333333]" />
-              <h2 className="text-lg font-medium text-[#1A1A1A]">Assigned Students</h2>
-            </div>
-            <Button
-              variant="outline"
-              onClick={() => navigate(`/admin/experts/${id}/assign`)}
-              className="border-[#9E9E9E] text-[#333333] hover:bg-[#F5F5F5]"
-            >
-              Assign New Student
-            </Button>
+          <div className="flex items-center gap-3 mb-4">
+            <BookOpen className="w-5 h-5 text-[#333333]" />
+            <h2 className="text-lg font-medium text-[#1A1A1A]">Assigned Students</h2>
           </div>
 
           {assignedStudents.length === 0 ? (
             <div className="text-center py-12">
-              <p className="text-[#757575] mb-4">No students currently assigned</p>
-              <Button
-                onClick={() => navigate(`/admin/experts/${id}/assign`)}
-                className="bg-[#333333] hover:bg-[#1A1A1A] text-white"
-              >
-                Assign Students
-              </Button>
+              <p className="text-[#757575]">No students currently assigned</p>
             </div>
           ) : (
             <div className="bg-white border border-[#D0D0D0] rounded-lg overflow-hidden">
@@ -139,18 +104,23 @@ export default function ViewExpertCaseload() {
                     <th className="text-left p-4 text-sm font-medium text-[#4A4A4A]">Last Incident</th>
                     <th className="text-left p-4 text-sm font-medium text-[#4A4A4A]">Priority</th>
                     <th className="text-left p-4 text-sm font-medium text-[#4A4A4A]">Assigned Date</th>
+                    <th className="text-left p-4 text-sm font-medium text-[#4A4A4A]">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
                   {assignedStudents.map((student, index) => (
                     <tr
                       key={student.id}
-                      className={`border-b border-[#E0E0E0] hover:bg-[#FAFAFA] cursor-pointer ${
+                      className={`border-b border-[#E0E0E0] hover:bg-[#FAFAFA] ${
                         index % 2 === 0 ? 'bg-white' : 'bg-[#FAFAFA]'
                       }`}
-                      onClick={() => navigate(`/admin/students/${student.id}`)}
                     >
-                      <td className="p-4 text-[#1A1A1A] font-medium">{student.name}</td>
+                      <td
+                        className="p-4 text-[#1A1A1A] font-medium cursor-pointer hover:underline"
+                        onClick={() => navigate(`/admin/students/${student.id}`)}
+                      >
+                        {student.name}
+                      </td>
                       <td className="p-4 text-[#4A4A4A]">{student.id}</td>
                       <td className="p-4 text-[#4A4A4A]">Grade {student.grade}</td>
                       <td className="p-4 text-[#1A1A1A]">{student.incidentCount}</td>
@@ -165,6 +135,20 @@ export default function ViewExpertCaseload() {
                         </Badge>
                       </td>
                       <td className="p-4 text-[#757575]">{student.assignedDate}</td>
+                      <td className="p-4">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleUnlink({ id: student.id, name: student.name });
+                          }}
+                          className="text-[#757575] hover:text-[#333333] hover:bg-[#F5F5F5]"
+                        >
+                          <X className="w-4 h-4 mr-1" />
+                          Unlink
+                        </Button>
+                      </td>
                     </tr>
                   ))}
                 </tbody>
@@ -190,6 +174,38 @@ export default function ViewExpertCaseload() {
           </Button>
         </div>
       </div>
-    </div>
+
+      {/* Unlink Confirmation Modal */}
+      <Dialog open={unlinkOpen} onOpenChange={setUnlinkOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-[#1A1A1A]">Unlink Student</DialogTitle>
+          </DialogHeader>
+          <div className="py-4">
+            <p className="text-[#4A4A4A]">
+              Are you sure you want to unlink <span className="font-medium">{studentToUnlink?.name}</span> from <span className="font-medium">{expert.name}</span>?
+            </p>
+            <p className="text-sm text-[#757575] mt-2">
+              This student will no longer be assigned to this behavioral expert.
+            </p>
+          </div>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setUnlinkOpen(false)}
+              className="border-[#9E9E9E] text-[#333333]"
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleConfirmUnlink}
+              className="bg-[#333333] hover:bg-[#1A1A1A] text-white"
+            >
+              Unlink Student
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </AdminLayout>
   );
 }

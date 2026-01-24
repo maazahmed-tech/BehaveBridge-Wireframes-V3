@@ -3,12 +3,15 @@ import { useNavigate } from 'react-router-dom';
 import { AdminLayout } from '@/app/components/AdminLayout';
 import { Button } from '@/app/components/ui/button';
 import { Input } from '@/app/components/ui/input';
+import { Label } from '@/app/components/ui/label';
 import { Card, CardContent } from '@/app/components/ui/card';
 import { Badge } from '@/app/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/app/components/ui/table';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/app/components/ui/dropdown-menu';
-import { Search, Plus, MoreVertical, UserCheck, UserX, Users } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/app/components/ui/dialog';
+import { Search, Plus, MoreVertical, UserCheck, UserX, Users, Eye, EyeOff } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/app/components/ui/select';
+import { toast } from 'sonner';
 
 interface Expert {
   id: string;
@@ -25,6 +28,18 @@ export default function ExpertManagement() {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
+
+  // Reset Password Modal State
+  const [resetPasswordOpen, setResetPasswordOpen] = useState(false);
+  const [selectedExpert, setSelectedExpert] = useState<Expert | null>(null);
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  // Deactivate Modal State
+  const [deactivateOpen, setDeactivateOpen] = useState(false);
+  const [expertToDeactivate, setExpertToDeactivate] = useState<Expert | null>(null);
 
   const experts: Expert[] = [
     {
@@ -60,7 +75,7 @@ export default function ExpertManagement() {
   ];
 
   const filteredExperts = experts.filter(expert => {
-    const matchesSearch = 
+    const matchesSearch =
       expert.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       expert.expertId.toLowerCase().includes(searchQuery.toLowerCase()) ||
       expert.email.toLowerCase().includes(searchQuery.toLowerCase());
@@ -70,6 +85,44 @@ export default function ExpertManagement() {
 
   const totalStudents = experts.reduce((sum, e) => sum + e.assignedStudents, 0);
   const totalActiveCases = experts.reduce((sum, e) => sum + e.activeCases, 0);
+
+  const handleResetPassword = (expert: Expert) => {
+    setSelectedExpert(expert);
+    setNewPassword('');
+    setConfirmPassword('');
+    setShowPassword(false);
+    setShowConfirmPassword(false);
+    setResetPasswordOpen(true);
+  };
+
+  const handleSubmitResetPassword = () => {
+    if (newPassword.length < 8) {
+      toast.error('Password must be at least 8 characters');
+      return;
+    }
+    if (newPassword !== confirmPassword) {
+      toast.error('Passwords do not match');
+      return;
+    }
+    toast.success(`Password has been reset for ${selectedExpert?.name}`);
+    setResetPasswordOpen(false);
+    setSelectedExpert(null);
+    setNewPassword('');
+    setConfirmPassword('');
+  };
+
+  const handleDeactivate = (expert: Expert) => {
+    setExpertToDeactivate(expert);
+    setDeactivateOpen(true);
+  };
+
+  const handleConfirmDeactivate = () => {
+    if (expertToDeactivate) {
+      toast.success(`Expert ${expertToDeactivate.status === 'Active' ? 'deactivated' : 'reactivated'} successfully`);
+      setDeactivateOpen(false);
+      setExpertToDeactivate(null);
+    }
+  };
 
   return (
     <AdminLayout>
@@ -228,16 +281,10 @@ export default function ExpertManagement() {
                           <DropdownMenuItem onClick={() => navigate(`/admin/experts/${expert.id}/view`)}>
                             Account Status
                           </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => alert('Reset password email sent')}>
+                          <DropdownMenuItem onClick={() => handleResetPassword(expert)}>
                             Reset Password
                           </DropdownMenuItem>
-                          <DropdownMenuItem
-                            onClick={() => {
-                              if (confirm(`${expert.status === 'Active' ? 'Deactivate' : 'Reactivate'} ${expert.name}?`)) {
-                                alert(`Expert ${expert.status === 'Active' ? 'deactivated' : 'reactivated'} successfully`);
-                              }
-                            }}
-                          >
+                          <DropdownMenuItem onClick={() => handleDeactivate(expert)}>
                             {expert.status === 'Active' ? 'Deactivate' : 'Reactivate'}
                           </DropdownMenuItem>
                         </DropdownMenuContent>
@@ -269,6 +316,112 @@ export default function ExpertManagement() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Reset Password Modal */}
+      <Dialog open={resetPasswordOpen} onOpenChange={setResetPasswordOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-[#1A1A1A]">Reset Password</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="bg-[#F5F5F5] p-3 rounded-lg">
+              <p className="text-sm text-[#757575]">Account</p>
+              <p className="text-[#1A1A1A] font-medium">{selectedExpert?.name}</p>
+              <p className="text-sm text-[#757575]">{selectedExpert?.email}</p>
+              <p className="text-xs text-[#9E9E9E]">{selectedExpert?.expertId}</p>
+            </div>
+            <div>
+              <Label htmlFor="newPassword" className="text-[#4A4A4A]">New Password</Label>
+              <div className="relative mt-1">
+                <Input
+                  id="newPassword"
+                  type={showPassword ? 'text' : 'password'}
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  className="border-[#D0D0D0] pr-10"
+                  placeholder="Enter new password"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-[#757575] hover:text-[#1A1A1A]"
+                >
+                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
+              </div>
+              <p className="text-xs text-[#757575] mt-1">Minimum 8 characters</p>
+            </div>
+            <div>
+              <Label htmlFor="confirmPassword" className="text-[#4A4A4A]">Confirm Password</Label>
+              <div className="relative mt-1">
+                <Input
+                  id="confirmPassword"
+                  type={showConfirmPassword ? 'text' : 'password'}
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  className="border-[#D0D0D0] pr-10"
+                  placeholder="Confirm new password"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-[#757575] hover:text-[#1A1A1A]"
+                >
+                  {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
+              </div>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setResetPasswordOpen(false)}
+              className="border-[#9E9E9E] text-[#333333]"
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleSubmitResetPassword}
+              className="bg-[#333333] hover:bg-[#1A1A1A] text-white"
+            >
+              Reset Password
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Deactivate/Reactivate Modal */}
+      <Dialog open={deactivateOpen} onOpenChange={setDeactivateOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-[#1A1A1A]">
+              {expertToDeactivate?.status === 'Active' ? 'Deactivate' : 'Reactivate'} Account
+            </DialogTitle>
+          </DialogHeader>
+          <div className="py-4">
+            <p className="text-[#4A4A4A]">
+              {expertToDeactivate?.status === 'Active'
+                ? `Are you sure you want to deactivate ${expertToDeactivate?.name}'s account? They will no longer be able to access the expert portal.`
+                : `Are you sure you want to reactivate ${expertToDeactivate?.name}'s account? They will regain access to the expert portal.`}
+            </p>
+          </div>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setDeactivateOpen(false)}
+              className="border-[#9E9E9E] text-[#333333]"
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleConfirmDeactivate}
+              className="bg-[#333333] hover:bg-[#1A1A1A] text-white"
+            >
+              {expertToDeactivate?.status === 'Active' ? 'Deactivate' : 'Reactivate'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </AdminLayout>
   );
 }

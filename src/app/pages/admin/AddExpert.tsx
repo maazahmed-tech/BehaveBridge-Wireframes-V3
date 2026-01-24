@@ -5,7 +5,6 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/app/components/ui/ca
 import { Button } from '@/app/components/ui/button';
 import { Input } from '@/app/components/ui/input';
 import { Label } from '@/app/components/ui/label';
-import { Textarea } from '@/app/components/ui/textarea';
 import { ArrowLeft } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -18,10 +17,6 @@ export default function AddExpert() {
     lastName: 'Chen',
     email: 'michael.chen@behaviorexperts.com',
     phone: '(555) 987-6543',
-    credentials: 'BCBA, PhD',
-    specializations: 'Autism Spectrum, Anxiety, ADHD',
-    licenseNumber: 'BCBA-12345',
-    bio: 'Board Certified Behavior Analyst with 12 years of experience working with K-5 students. Specializes in positive behavior interventions and collaborative consultation.'
   });
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -126,60 +121,6 @@ export default function AddExpert() {
                     placeholder="(555) 123-4567"
                   />
                 </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="mb-6 border-[#D0D0D0]">
-            <CardHeader>
-              <CardTitle className="text-[#1A1A1A]">Professional Qualifications</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div>
-                <Label htmlFor="credentials" className="text-[#4A4A4A]">Credentials & Certifications *</Label>
-                <Input
-                  id="credentials"
-                  required
-                  value={formData.credentials}
-                  onChange={(e) => setFormData({ ...formData, credentials: e.target.value })}
-                  className="border-[#D0D0D0] text-[#1A1A1A]"
-                  placeholder="e.g., Ph.D. in School Psychology, BCBA"
-                />
-              </div>
-
-              <div>
-                <Label htmlFor="licenseNumber" className="text-[#4A4A4A]">License Number</Label>
-                <Input
-                  id="licenseNumber"
-                  value={formData.licenseNumber}
-                  onChange={(e) => setFormData({ ...formData, licenseNumber: e.target.value })}
-                  className="border-[#D0D0D0] text-[#1A1A1A]"
-                  placeholder="Professional license number"
-                />
-              </div>
-
-              <div>
-                <Label htmlFor="specializations" className="text-[#4A4A4A]">Areas of Specialization *</Label>
-                <Input
-                  id="specializations"
-                  required
-                  value={formData.specializations}
-                  onChange={(e) => setFormData({ ...formData, specializations: e.target.value })}
-                  className="border-[#D0D0D0] text-[#1A1A1A]"
-                  placeholder="e.g., ADHD, Autism Spectrum, Behavioral Interventions"
-                />
-              </div>
-
-              <div>
-                <Label htmlFor="bio" className="text-[#4A4A4A]">Professional Bio</Label>
-                <Textarea
-                  id="bio"
-                  value={formData.bio}
-                  onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
-                  rows={4}
-                  className="border-[#D0D0D0] text-[#1A1A1A]"
-                  placeholder="Brief professional background and expertise..."
-                />
               </div>
             </CardContent>
           </Card>

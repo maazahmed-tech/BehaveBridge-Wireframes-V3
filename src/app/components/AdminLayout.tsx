@@ -10,7 +10,8 @@ import {
   Settings,
   LogOut,
   Menu,
-  X
+  X,
+  Link2
 } from 'lucide-react';
 
 interface AdminLayoutProps {
@@ -29,6 +30,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
     { icon: GraduationCap, label: 'Teachers', path: '/admin/teachers' },
     { icon: Brain, label: 'Behavioral Experts', path: '/admin/experts' },
     { icon: UserCircle, label: 'Parents', path: '/admin/parents' },
+    { icon: Link2, label: 'Assignments', path: '/admin/assignments' },
     { icon: Settings, label: 'Settings', path: '/admin/account' }
   ];
 
