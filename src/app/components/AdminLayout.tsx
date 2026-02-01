@@ -1,4 +1,4 @@
-import { ReactNode, useState } from 'react';
+import { ReactNode, useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Button } from '@/app/components/ui/button';
 import {
@@ -21,8 +21,14 @@ interface AdminLayoutProps {
 export function AdminLayout({ children }: AdminLayoutProps) {
   const navigate = useNavigate();
   const location = useLocation();
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(() => {
+    return localStorage.getItem('adminSidebarOpen') === 'true';
+  });
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  useEffect(() => {
+    localStorage.setItem('adminSidebarOpen', String(sidebarOpen));
+  }, [sidebarOpen]);
 
   const navItems = [
     { icon: LayoutDashboard, label: 'Dashboard', path: '/admin/dashboard' },
@@ -124,8 +130,22 @@ export function AdminLayout({ children }: AdminLayoutProps) {
       <div className={`flex-1 flex flex-col min-h-screen transition-all duration-300 ${
         sidebarOpen ? 'md:ml-[280px]' : 'md:ml-[72px]'
       }`}>
+        {/* Mobile Header */}
+        <header className="md:hidden bg-white border-b border-[#D0D0D0] px-4 py-3 flex items-center justify-between sticky top-0 z-30">
+          <button
+            onClick={() => setMobileMenuOpen(true)}
+            className="p-2 text-[#757575] hover:text-[#333333] hover:bg-[#F5F5F5] rounded-lg"
+          >
+            <Menu className="w-6 h-6" />
+          </button>
+          <h1 className="font-bold text-lg text-[#1A1A1A]">BehaveBridge</h1>
+          <div className="w-8 h-8 rounded-full bg-[#E0E0E0] flex items-center justify-center">
+            <UserCircle className="w-5 h-5 text-[#333333]" />
+          </div>
+        </header>
+
         {/* Page Content - Scrollable */}
-        <main className="flex-1 p-6 overflow-y-auto">{children}</main>
+        <main className="flex-1 p-4 md:p-6 overflow-y-auto">{children}</main>
       </div>
 
       {/* Mobile Sidebar */}
@@ -164,7 +184,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
           </div>
 
           {/* Navigation */}
-          <nav className="flex-1 p-4 space-y-2 overflow-hidden">
+          <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
             {navItems.map((item) => {
               const Icon = item.icon;
               const isActive = location.pathname === item.path;

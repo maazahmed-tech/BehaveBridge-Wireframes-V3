@@ -42,13 +42,13 @@ export default function AddStudent() {
 
   return (
     <AdminLayout>
-      <div className="max-w-4xl">
-        <Link to="/admin/students" className="inline-flex items-center gap-2 text-[#4A4A4A] hover:text-[#1A1A1A] mb-6">
+      <div className="max-w-4xl mx-auto">
+        <Link to="/admin/students" className="inline-flex items-center gap-2 text-[#4A4A4A] hover:text-[#1A1A1A] mb-4 md:mb-6 text-sm md:text-base">
           <ArrowLeft className="w-4 h-4" />
           Back to Students
         </Link>
 
-        <h1 className="text-2xl text-[#1A1A1A] mb-6">Add New Student</h1>
+        <h1 className="text-2xl md:text-3xl font-bold text-[#1A1A1A] mb-6">Add New Student</h1>
 
         <form onSubmit={handleSubmit}>
           <Card className="mb-6 border-[#D0D0D0]">
@@ -56,7 +56,7 @@ export default function AddStudent() {
               <CardTitle className="text-[#1A1A1A]">Basic Information</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <Label htmlFor="studentId" className="text-[#4A4A4A]">Student ID *</Label>
                   <Input
@@ -81,7 +81,7 @@ export default function AddStudent() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <Label htmlFor="firstName" className="text-[#4A4A4A]">First Name *</Label>
                   <Input
@@ -104,7 +104,7 @@ export default function AddStudent() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <Label htmlFor="grade" className="text-[#4A4A4A]">Grade *</Label>
                   <select
@@ -158,7 +158,7 @@ export default function AddStudent() {
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <Label htmlFor="guardianEmail" className="text-[#4A4A4A]">Guardian Email *</Label>
                   <Input
@@ -184,7 +184,7 @@ export default function AddStudent() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <Label htmlFor="emergencyContact" className="text-[#4A4A4A]">Emergency Contact Name</Label>
                   <Input
@@ -214,7 +214,7 @@ export default function AddStudent() {
               <CardTitle className="text-[#1A1A1A]">Special Education & Medical</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <Label htmlFor="iepStatus" className="text-[#4A4A4A]">IEP Status</Label>
                   <select
@@ -228,7 +228,7 @@ export default function AddStudent() {
                     <option value="Pending">Pending Evaluation</option>
                   </select>
                 </div>
-                <div className="flex items-center gap-2 pt-6">
+                <div className="flex items-center gap-2 md:pt-6">
                   <input
                     type="checkbox"
                     id="section504"
@@ -256,20 +256,20 @@ export default function AddStudent() {
             </CardContent>
           </Card>
 
-          <div className="flex gap-3">
-            <Button
-              type="submit"
-              className="bg-[#333333] hover:bg-[#1A1A1A] text-white"
-            >
-              Add Student
-            </Button>
+          <div className="flex flex-col-reverse sm:flex-row gap-3">
             <Button
               type="button"
               variant="outline"
               onClick={() => navigate('/admin/students')}
-              className="border-[#9E9E9E] text-[#333333] hover:bg-[#F5F5F5]"
+              className="border-[#9E9E9E] text-[#333333] hover:bg-[#F5F5F5] w-full sm:w-auto"
             >
               Cancel
+            </Button>
+            <Button
+              type="submit"
+              className="bg-[#333333] hover:bg-[#1A1A1A] text-white w-full sm:w-auto"
+            >
+              Add Student
             </Button>
           </div>
         </form>

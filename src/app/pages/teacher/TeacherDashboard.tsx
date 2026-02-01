@@ -32,10 +32,10 @@ export default function TeacherDashboard() {
       <div className="max-w-7xl mx-auto space-y-6">
         {/* Greeting */}
         <div>
-          <h1 className="text-3xl font-bold text-[#1A1A1A]">
+          <h1 className="text-2xl md:text-3xl font-bold text-[#1A1A1A]">
             Good morning, Maria
           </h1>
-          <p className="text-[#757575]">{today}</p>
+          <p className="text-sm md:text-base text-[#757575]">{today}</p>
         </div>
 
         {/* Quick Actions */}
@@ -111,29 +111,55 @@ export default function TeacherDashboard() {
             {todaysIncidents.map((incident, index) => (
               <div
                 key={index}
-                className="flex items-center justify-between p-4 border border-[#E0E0E0] rounded-lg hover:bg-[#F5F5F5] cursor-pointer"
+                className="p-4 border border-[#E0E0E0] rounded-lg hover:bg-[#F5F5F5] cursor-pointer"
               >
-                <div className="flex-1">
-                  <div className="flex items-center space-x-3">
-                    <span className="text-sm font-medium text-[#757575]">
-                      {incident.time}
-                    </span>
+                {/* Mobile: stacked layout */}
+                <div className="flex flex-col space-y-2 md:hidden">
+                  <div className="flex items-center justify-between">
                     <span className="text-[#1A1A1A] font-medium">
                       {incident.student}
                     </span>
-                    <span className="text-[#4A4A4A]">{incident.trigger}</span>
+                    <Badge
+                      variant={incident.status === 'Resolved' ? 'outline' : 'secondary'}
+                      className={
+                        incident.status === 'Resolved'
+                          ? 'border-[#9E9E9E] text-[#4A4A4A]'
+                          : 'bg-[#E0E0E0] text-[#4A4A4A]'
+                      }
+                    >
+                      {incident.status}
+                    </Badge>
+                  </div>
+                  <div className="flex items-center space-x-2 text-sm text-[#757575]">
+                    <span>{incident.time}</span>
+                    <span>•</span>
+                    <span>{incident.trigger}</span>
                   </div>
                 </div>
-                <Badge
-                  variant={incident.status === 'Resolved' ? 'outline' : 'secondary'}
-                  className={
-                    incident.status === 'Resolved'
-                      ? 'border-[#9E9E9E] text-[#4A4A4A]'
-                      : 'bg-[#E0E0E0] text-[#4A4A4A]'
-                  }
-                >
-                  {incident.status}
-                </Badge>
+                {/* Desktop: horizontal layout */}
+                <div className="hidden md:flex items-center justify-between">
+                  <div className="flex-1">
+                    <div className="flex items-center space-x-3">
+                      <span className="text-sm font-medium text-[#757575]">
+                        {incident.time}
+                      </span>
+                      <span className="text-[#1A1A1A] font-medium">
+                        {incident.student}
+                      </span>
+                      <span className="text-[#4A4A4A]">{incident.trigger}</span>
+                    </div>
+                  </div>
+                  <Badge
+                    variant={incident.status === 'Resolved' ? 'outline' : 'secondary'}
+                    className={
+                      incident.status === 'Resolved'
+                        ? 'border-[#9E9E9E] text-[#4A4A4A]'
+                        : 'bg-[#E0E0E0] text-[#4A4A4A]'
+                    }
+                  >
+                    {incident.status}
+                  </Badge>
+                </div>
               </div>
             ))}
           </div>

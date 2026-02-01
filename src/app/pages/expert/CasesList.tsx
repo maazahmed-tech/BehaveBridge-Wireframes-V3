@@ -105,19 +105,19 @@ export default function CasesList() {
 
   const CaseCard = ({ case: caseItem }: { case: typeof cases[0] }) => (
     <Card className="border-[#D0D0D0] hover:bg-[#FAFAFA] transition-colors">
-      <CardContent className="p-6">
-        <div className="flex items-start justify-between mb-4">
+      <CardContent className="p-4 md:p-6">
+        <div className="flex flex-col md:flex-row md:items-start md:justify-between mb-4">
           <div className="flex-1">
-            <div className="flex items-center gap-3 mb-2">
+            <div className="flex items-center gap-2 flex-wrap mb-2">
               {getSeverityBadge(caseItem.severity)}
               <Badge className={caseItem.status === 'Under Review' ? 'bg-[#9E9E9E] text-white' : 'bg-[#757575] text-white'}>
                 {caseItem.status}
               </Badge>
             </div>
-            <h3 className="text-lg font-medium text-[#1A1A1A] mb-1">
+            <h3 className="text-base md:text-lg font-medium text-[#1A1A1A] mb-1">
               {caseItem.student.name} <span className="text-[#757575] text-sm">• Grade {caseItem.student.grade}</span>
             </h3>
-            <p className="text-sm text-[#757575]">
+            <p className="text-xs md:text-sm text-[#757575]">
               Submitted by {caseItem.teacher.name} on {new Date(caseItem.submittedDate).toLocaleDateString('en-US', {
                 month: 'short',
                 day: 'numeric',
@@ -127,33 +127,33 @@ export default function CasesList() {
           </div>
         </div>
 
-        <div className="mb-4">
-          <div className="text-sm text-[#757575] mb-1">Trigger</div>
-          <div className="text-[#1A1A1A]">{caseItem.trigger}</div>
+        <div className="mb-3 md:mb-4">
+          <div className="text-xs md:text-sm text-[#757575] mb-1">Trigger</div>
+          <div className="text-sm md:text-base text-[#1A1A1A]">{caseItem.trigger}</div>
         </div>
 
-        <div className="mb-4">
-          <div className="text-sm text-[#757575] mb-1">Teacher's Note</div>
-          <p className="text-[#4A4A4A] text-sm line-clamp-2">{caseItem.notePreview}</p>
+        <div className="mb-3 md:mb-4">
+          <div className="text-xs md:text-sm text-[#757575] mb-1">Teacher's Note</div>
+          <p className="text-[#4A4A4A] text-xs md:text-sm line-clamp-2">{caseItem.notePreview}</p>
         </div>
 
-        <div className="mb-4">
-          <div className="text-sm text-[#757575] mb-1">Parent Acknowledgment Status</div>
+        <div className="mb-3 md:mb-4">
+          <div className="text-xs md:text-sm text-[#757575] mb-1">Parent Status</div>
           {caseItem.parentAcknowledged ? (
             <Badge className="bg-[#757575] text-white">
               Acknowledged
             </Badge>
           ) : (
             <Badge className="bg-[#E0E0E0] text-[#4A4A4A]">
-              Not yet acknowledged
+              Not acknowledged
             </Badge>
           )}
         </div>
 
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-3 border-t border-[#E0E0E0]">
           <span className="text-xs text-[#757575]">Case ID: {caseItem.id}</span>
-          <Link to={`/expert/cases/${caseItem.id}`}>
-            <Button className="bg-[#333333] hover:bg-[#1A1A1A] text-white">
+          <Link to={`/expert/cases/${caseItem.id}`} className="w-full sm:w-auto">
+            <Button className="w-full sm:w-auto bg-[#333333] hover:bg-[#1A1A1A] text-white">
               View Details
             </Button>
           </Link>
@@ -164,16 +164,16 @@ export default function CasesList() {
 
   return (
     <ExpertLayout>
-      <div className="p-8">
+      <div className="max-w-7xl mx-auto">
         <div className="mb-6">
-          <h1 className="text-2xl text-[#1A1A1A] mb-2">Escalated Cases</h1>
-          <p className="text-[#4A4A4A]">Review and manage escalated behavioral cases</p>
+          <h1 className="text-2xl md:text-3xl font-bold text-[#1A1A1A] mb-2">Escalated Cases</h1>
+          <p className="text-sm md:text-base text-[#4A4A4A]">Review and manage escalated behavioral cases</p>
         </div>
 
-        <div className="flex gap-4 mb-6">
+        <div className="flex flex-col sm:flex-row gap-3 mb-6">
           <Select value={statusFilter} onValueChange={setStatusFilter}>
-            <SelectTrigger className="w-48 border-[#D0D0D0] text-[#1A1A1A]">
-              <SelectValue placeholder="All Status" />
+            <SelectTrigger className="w-full sm:w-40 border-[#D0D0D0] text-[#1A1A1A]">
+              <SelectValue placeholder="Status" />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All Status</SelectItem>
@@ -183,8 +183,8 @@ export default function CasesList() {
           </Select>
 
           <Select value={severityFilter} onValueChange={setSeverityFilter}>
-            <SelectTrigger className="w-48 border-[#D0D0D0] text-[#1A1A1A]">
-              <SelectValue placeholder="All Severity" />
+            <SelectTrigger className="w-full sm:w-40 border-[#D0D0D0] text-[#1A1A1A]">
+              <SelectValue placeholder="Severity" />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All Severity</SelectItem>

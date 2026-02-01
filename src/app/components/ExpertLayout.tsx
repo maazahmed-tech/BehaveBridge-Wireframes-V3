@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import {
   LayoutDashboard,
@@ -28,8 +28,14 @@ interface ExpertLayoutProps {
 export function ExpertLayout({ children }: ExpertLayoutProps) {
   const navigate = useNavigate();
   const location = useLocation();
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(() => {
+    return localStorage.getItem('expertSidebarOpen') === 'true';
+  });
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  useEffect(() => {
+    localStorage.setItem('expertSidebarOpen', String(sidebarOpen));
+  }, [sidebarOpen]);
 
   const navItems = [
     { icon: LayoutDashboard, label: 'Dashboard', path: '/expert/dashboard' },
@@ -133,14 +139,28 @@ export function ExpertLayout({ children }: ExpertLayoutProps) {
           sidebarOpen ? 'md:ml-[280px]' : 'md:ml-[72px]'
         }`}
       >
+        {/* Mobile Header */}
+        <header className="md:hidden bg-white border-b border-[#D0D0D0] px-4 py-3 flex items-center justify-between sticky top-0 z-30">
+          <button
+            onClick={() => setMobileMenuOpen(true)}
+            className="p-2 text-[#757575] hover:text-[#333333] hover:bg-[#F5F5F5] rounded-lg"
+          >
+            <Menu className="w-6 h-6" />
+          </button>
+          <h1 className="font-bold text-lg text-[#1A1A1A]">BehaveBridge</h1>
+          <Avatar className="w-8 h-8 bg-[#E0E0E0]">
+            <AvatarFallback className="text-[#333333] text-sm">SW</AvatarFallback>
+          </Avatar>
+        </header>
+
         {/* Page Content - Scrollable */}
-        <main className="flex-1 p-6 overflow-y-auto">{children}</main>
+        <main className="flex-1 p-4 md:p-6 overflow-y-auto">{children}</main>
       </div>
 
       {/* Mobile Sidebar */}
       <aside
         className={`fixed inset-y-0 left-0 z-50 bg-white border-r border-[#D0D0D0] transition-transform duration-300 w-[280px] md:hidden ${
-          sidebarOpen ? 'translate-x-0' : '-translate-x-full'
+          mobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
         <div className="h-full flex flex-col">
@@ -151,7 +171,7 @@ export function ExpertLayout({ children }: ExpertLayoutProps) {
                 BehaveBridge
               </h1>
               <button
-                onClick={() => setSidebarOpen(false)}
+                onClick={() => setMobileMenuOpen(false)}
                 className="text-[#757575] hover:text-[#333333]"
               >
                 <X className="w-5 h-5" />
@@ -175,7 +195,7 @@ export function ExpertLayout({ children }: ExpertLayoutProps) {
           </div>
 
           {/* Navigation */}
-          <nav className="flex-1 p-4 space-y-2 overflow-hidden">
+          <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
             {navItems.map((item) => {
               const Icon = item.icon;
               const isActive = location.pathname === item.path;
@@ -183,7 +203,7 @@ export function ExpertLayout({ children }: ExpertLayoutProps) {
                 <Link
                   key={item.path}
                   to={item.path}
-                  onClick={() => setSidebarOpen(false)}
+                  onClick={() => setMobileMenuOpen(false)}
                   className={`flex items-center px-4 py-3 rounded-lg transition-colors ${
                     isActive
                       ? 'bg-[#E0E0E0] text-[#1A1A1A]'
@@ -211,10 +231,10 @@ export function ExpertLayout({ children }: ExpertLayoutProps) {
       </aside>
 
       {/* Mobile Overlay */}
-      {sidebarOpen && (
+      {mobileMenuOpen && (
         <div
           className="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden"
-          onClick={() => setSidebarOpen(false)}
+          onClick={() => setMobileMenuOpen(false)}
         />
       )}
     </div>

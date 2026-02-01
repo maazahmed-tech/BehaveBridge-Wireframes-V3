@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search } from 'lucide-react';
+import { Search, User, ChevronRight } from 'lucide-react';
 import { TeacherLayout } from '@/app/components/TeacherLayout';
 import { Input } from '@/app/components/ui/input';
 import { Button } from '@/app/components/ui/button';
@@ -57,8 +57,8 @@ export default function TeacherStudents() {
     <TeacherLayout>
       <div className="max-w-7xl mx-auto space-y-6">
         <div>
-          <h1 className="text-3xl font-bold text-[#1A1A1A]">Students</h1>
-          <p className="text-[#757575]">Search and view your assigned students</p>
+          <h1 className="text-2xl md:text-3xl font-bold text-[#1A1A1A]">Students</h1>
+          <p className="text-sm md:text-base text-[#757575]">Search and view your assigned students</p>
         </div>
 
         <Card className="p-6 border border-[#D0D0D0] bg-white">
@@ -103,52 +103,83 @@ export default function TeacherStudents() {
             Showing {filteredStudents.length} of {STUDENTS.length} students
           </p>
 
-          {/* Students Table */}
+          {/* Students - Mobile Card View */}
           {filteredStudents.length > 0 ? (
-            <div className="border border-[#E0E0E0] rounded-lg overflow-hidden">
-              <Table>
-                <TableHeader>
-                  <TableRow className="bg-[#F5F5F5]">
-                    <TableHead className="text-[#1A1A1A] font-semibold">Name</TableHead>
-                    <TableHead className="text-[#1A1A1A] font-semibold">Student ID</TableHead>
-                    <TableHead className="text-[#1A1A1A] font-semibold">Grade</TableHead>
-                    <TableHead className="text-[#1A1A1A] font-semibold">Class</TableHead>
-                    <TableHead className="text-[#1A1A1A] font-semibold text-right">Action</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {filteredStudents.map((student) => (
-                    <TableRow
-                      key={student.id}
-                      className="hover:bg-[#F5F5F5] cursor-pointer"
-                      onClick={() => navigate(`/teacher/students/${student.id}`)}
-                    >
-                      <TableCell className="font-medium text-[#1A1A1A]">
-                        {student.name}
-                      </TableCell>
-                      <TableCell className="text-[#4A4A4A]">{student.id}</TableCell>
-                      <TableCell className="text-[#4A4A4A]">Grade {student.grade}</TableCell>
-                      <TableCell className="text-[#4A4A4A]">
-                        {student.primaryTeacher}
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          className="border-[#D0D0D0] text-[#333333] hover:bg-[#F5F5F5] rounded-lg"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            navigate(`/teacher/students/${student.id}`);
-                          }}
-                        >
-                          View
-                        </Button>
-                      </TableCell>
+            <>
+              {/* Mobile Card View */}
+              <div className="md:hidden space-y-3">
+                {filteredStudents.map((student) => (
+                  <div
+                    key={student.id}
+                    className="p-4 border border-[#E0E0E0] rounded-lg hover:bg-[#F5F5F5] cursor-pointer active:bg-[#E0E0E0] transition-colors"
+                    onClick={() => navigate(`/teacher/students/${student.id}`)}
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-3">
+                        <div className="w-10 h-10 rounded-full bg-[#E0E0E0] flex items-center justify-center flex-shrink-0">
+                          <User className="w-5 h-5 text-[#757575]" />
+                        </div>
+                        <div>
+                          <h3 className="font-semibold text-[#1A1A1A]">{student.name}</h3>
+                          <p className="text-sm text-[#757575]">Grade {student.grade}</p>
+                        </div>
+                      </div>
+                      <ChevronRight className="w-5 h-5 text-[#9E9E9E]" />
+                    </div>
+                    <div className="mt-3 pt-3 border-t border-[#E0E0E0] flex items-center justify-between text-sm">
+                      <span className="text-[#757575]">{student.id}</span>
+                      <span className="text-[#4A4A4A]">{student.primaryTeacher}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Desktop Table View */}
+              <div className="hidden md:block border border-[#E0E0E0] rounded-lg overflow-hidden">
+                <Table>
+                  <TableHeader>
+                    <TableRow className="bg-[#F5F5F5]">
+                      <TableHead className="text-[#1A1A1A] font-semibold">Name</TableHead>
+                      <TableHead className="text-[#1A1A1A] font-semibold">Student ID</TableHead>
+                      <TableHead className="text-[#1A1A1A] font-semibold">Grade</TableHead>
+                      <TableHead className="text-[#1A1A1A] font-semibold">Class</TableHead>
+                      <TableHead className="text-[#1A1A1A] font-semibold text-right">Action</TableHead>
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
+                  </TableHeader>
+                  <TableBody>
+                    {filteredStudents.map((student) => (
+                      <TableRow
+                        key={student.id}
+                        className="hover:bg-[#F5F5F5] cursor-pointer"
+                        onClick={() => navigate(`/teacher/students/${student.id}`)}
+                      >
+                        <TableCell className="font-medium text-[#1A1A1A]">
+                          {student.name}
+                        </TableCell>
+                        <TableCell className="text-[#4A4A4A]">{student.id}</TableCell>
+                        <TableCell className="text-[#4A4A4A]">Grade {student.grade}</TableCell>
+                        <TableCell className="text-[#4A4A4A]">
+                          {student.primaryTeacher}
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="border-[#D0D0D0] text-[#333333] hover:bg-[#F5F5F5] rounded-lg"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              navigate(`/teacher/students/${student.id}`);
+                            }}
+                          >
+                            View
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+            </>
           ) : (
             <div className="text-center py-12">
               <p className="text-[#757575]">No students found matching your search.</p>

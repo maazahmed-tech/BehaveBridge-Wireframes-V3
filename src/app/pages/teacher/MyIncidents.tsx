@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { Plus, Search, Filter } from 'lucide-react';
+import { Plus, Search, Filter, ChevronRight } from 'lucide-react';
 import { TeacherLayout } from '@/app/components/TeacherLayout';
 import { Button } from '@/app/components/ui/button';
 import { Card } from '@/app/components/ui/card';
@@ -138,10 +138,10 @@ export default function MyIncidents() {
 
   return (
     <TeacherLayout>
-      <div className="p-8">
+      <div className="max-w-7xl mx-auto">
         <div className="mb-6">
-          <h1 className="text-2xl text-[#1A1A1A] mb-2">My Incidents</h1>
-          <p className="text-[#4A4A4A]">
+          <h1 className="text-2xl md:text-3xl font-bold text-[#1A1A1A] mb-2">My Incidents</h1>
+          <p className="text-sm md:text-base text-[#4A4A4A]">
             View and manage your incident reports
           </p>
         </div>
@@ -201,7 +201,7 @@ export default function MyIncidents() {
           </p>
         </div>
 
-        {/* Incidents Table */}
+        {/* Incidents List */}
         {filteredIncidents.length === 0 ? (
           <Card className="border-[#D0D0D0] p-12">
             <div className="text-center">
@@ -222,78 +222,112 @@ export default function MyIncidents() {
             </div>
           </Card>
         ) : (
-          <div className="bg-white border border-[#D0D0D0] rounded-lg overflow-hidden">
-            <table className="w-full">
-              <thead>
-                <tr className="bg-[#F5F5F5] border-b border-[#D0D0D0]">
-                  <th className="text-left p-4 text-sm font-medium text-[#4A4A4A]">
-                    Date/Time
-                  </th>
-                  <th className="text-left p-4 text-sm font-medium text-[#4A4A4A]">
-                    Student
-                  </th>
-                  <th className="text-left p-4 text-sm font-medium text-[#4A4A4A]">
-                    Category
-                  </th>
-                  <th className="text-left p-4 text-sm font-medium text-[#4A4A4A]">
-                    Severity
-                  </th>
-                  <th className="text-left p-4 text-sm font-medium text-[#4A4A4A]">
-                    Status
-                  </th>
-                  <th className="text-left p-4 text-sm font-medium text-[#4A4A4A]">
-                    Action
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredIncidents.map((incident, index) => (
-                  <tr
-                    key={incident.id}
-                    className={`border-b border-[#E0E0E0] hover:bg-[#FAFAFA] ${
-                      index % 2 === 0 ? 'bg-white' : 'bg-[#FAFAFA]'
-                    }`}
-                  >
-                    <td className="p-4">
-                      <div className="text-[#1A1A1A] font-medium">
-                        {new Date(incident.date).toLocaleDateString('en-US', {
-                          month: 'short',
-                          day: 'numeric',
-                          year: 'numeric',
-                        })}
+          <>
+            {/* Mobile Card View */}
+            <div className="md:hidden space-y-3">
+              {filteredIncidents.map((incident) => (
+                <Link key={incident.id} to={`/teacher/incidents/${incident.id}`}>
+                  <div className="bg-white border border-[#D0D0D0] rounded-lg p-4 hover:bg-[#F5F5F5] active:bg-[#E0E0E0] transition-colors">
+                    <div className="flex items-start justify-between mb-2">
+                      <div>
+                        <h3 className="font-semibold text-[#1A1A1A]">{incident.student}</h3>
+                        <p className="text-sm text-[#757575]">{incident.category}</p>
                       </div>
-                      <div className="text-sm text-[#757575]">
-                        {incident.time}
-                      </div>
-                    </td>
-                    <td className="p-4">
-                      <div className="text-[#1A1A1A]">
-                        {incident.student}
-                      </div>
-                    </td>
-                    <td className="p-4 text-[#4A4A4A]">{incident.category}</td>
-                    <td className="p-4 text-[#4A4A4A]">{incident.severity}</td>
-                    <td className="p-4">
                       <Badge className={getStatusColor(incident.outcome)}>
                         {incident.outcome}
                       </Badge>
-                    </td>
-                    <td className="p-4">
-                      <Link to={`/teacher/incidents/${incident.id}`}>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          className="border-[#9E9E9E] text-[#333333] hover:bg-[#F5F5F5]"
-                        >
-                          View Details
-                        </Button>
-                      </Link>
-                    </td>
+                    </div>
+                    <div className="flex items-center justify-between text-sm">
+                      <div className="text-[#757575]">
+                        {new Date(incident.date).toLocaleDateString('en-US', {
+                          month: 'short',
+                          day: 'numeric',
+                        })} • {incident.time}
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <span className="text-[#4A4A4A]">{incident.severity}</span>
+                        <ChevronRight className="w-4 h-4 text-[#9E9E9E]" />
+                      </div>
+                    </div>
+                  </div>
+                </Link>
+              ))}
+            </div>
+
+            {/* Desktop Table View */}
+            <div className="hidden md:block bg-white border border-[#D0D0D0] rounded-lg overflow-hidden">
+              <table className="w-full">
+                <thead>
+                  <tr className="bg-[#F5F5F5] border-b border-[#D0D0D0]">
+                    <th className="text-left p-4 text-sm font-medium text-[#4A4A4A]">
+                      Date/Time
+                    </th>
+                    <th className="text-left p-4 text-sm font-medium text-[#4A4A4A]">
+                      Student
+                    </th>
+                    <th className="text-left p-4 text-sm font-medium text-[#4A4A4A]">
+                      Category
+                    </th>
+                    <th className="text-left p-4 text-sm font-medium text-[#4A4A4A]">
+                      Severity
+                    </th>
+                    <th className="text-left p-4 text-sm font-medium text-[#4A4A4A]">
+                      Status
+                    </th>
+                    <th className="text-left p-4 text-sm font-medium text-[#4A4A4A]">
+                      Action
+                    </th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody>
+                  {filteredIncidents.map((incident, index) => (
+                    <tr
+                      key={incident.id}
+                      className={`border-b border-[#E0E0E0] hover:bg-[#FAFAFA] ${
+                        index % 2 === 0 ? 'bg-white' : 'bg-[#FAFAFA]'
+                      }`}
+                    >
+                      <td className="p-4">
+                        <div className="text-[#1A1A1A] font-medium">
+                          {new Date(incident.date).toLocaleDateString('en-US', {
+                            month: 'short',
+                            day: 'numeric',
+                            year: 'numeric',
+                          })}
+                        </div>
+                        <div className="text-sm text-[#757575]">
+                          {incident.time}
+                        </div>
+                      </td>
+                      <td className="p-4">
+                        <div className="text-[#1A1A1A]">
+                          {incident.student}
+                        </div>
+                      </td>
+                      <td className="p-4 text-[#4A4A4A]">{incident.category}</td>
+                      <td className="p-4 text-[#4A4A4A]">{incident.severity}</td>
+                      <td className="p-4">
+                        <Badge className={getStatusColor(incident.outcome)}>
+                          {incident.outcome}
+                        </Badge>
+                      </td>
+                      <td className="p-4">
+                        <Link to={`/teacher/incidents/${incident.id}`}>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="border-[#9E9E9E] text-[#333333] hover:bg-[#F5F5F5]"
+                          >
+                            View Details
+                          </Button>
+                        </Link>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </>
         )}
 
         {/* Pagination */}

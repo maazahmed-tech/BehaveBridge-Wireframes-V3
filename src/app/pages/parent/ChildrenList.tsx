@@ -39,28 +39,28 @@ export default function ChildrenList() {
 
   return (
     <ParentLayout>
-      <div className="max-w-4xl">
-        <h1 className="text-2xl text-[#1A1A1A] mb-6">My Children</h1>
+      <div className="max-w-4xl mx-auto">
+        <h1 className="text-2xl md:text-3xl font-bold text-[#1A1A1A] mb-6">My Children</h1>
 
         <div className="space-y-4">
           {children.map((child) => (
             <Card key={child.id} className="border-[#D0D0D0]">
-              <CardContent className="p-6">
-                <div className="flex items-start justify-between">
-                  <div className="flex items-start gap-4 flex-1">
-                    <div className="w-16 h-16 rounded-full bg-[#E0E0E0] flex items-center justify-center">
-                      <User className="w-8 h-8 text-[#757575]" />
+              <CardContent className="p-4 md:p-6">
+                <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
+                  <div className="flex items-start gap-3 md:gap-4 flex-1">
+                    <div className="w-12 h-12 md:w-16 md:h-16 rounded-full bg-[#E0E0E0] flex items-center justify-center flex-shrink-0">
+                      <User className="w-6 h-6 md:w-8 md:h-8 text-[#757575]" />
                     </div>
                     <div className="flex-1">
-                      <h2 className="text-xl text-[#1A1A1A] mb-1">{child.name}</h2>
-                      <p className="text-[#757575] mb-3">
+                      <h2 className="text-lg md:text-xl text-[#1A1A1A] mb-1">{child.name}</h2>
+                      <p className="text-sm md:text-base text-[#757575]">
                         {child.grade} • {child.teacher}
                       </p>
                     </div>
                   </div>
 
-                  <Link to={`/parent/children/${child.id}`}>
-                    <Button className="bg-[#333333] hover:bg-[#1A1A1A] text-white">
+                  <Link to={`/parent/children/${child.id}`} className="w-full md:w-auto">
+                    <Button className="w-full md:w-auto bg-[#333333] hover:bg-[#1A1A1A] text-white">
                       View Profile
                       <ArrowRight className="w-4 h-4 ml-2" />
                     </Button>

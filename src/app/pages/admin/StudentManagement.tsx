@@ -19,7 +19,7 @@ import {
   DropdownMenuTrigger,
 } from '@/app/components/ui/dropdown-menu';
 import { ConfirmationModal } from '@/app/components/ConfirmationModal';
-import { Search, Plus, MoreVertical, CheckSquare, Upload, Users, Brain } from 'lucide-react';
+import { Search, Plus, MoreVertical, CheckSquare, Upload, Users, Brain, User, ChevronRight } from 'lucide-react';
 import { Checkbox } from '@/app/components/ui/checkbox';
 import { STUDENTS } from '@/data/constants';
 import { toast } from 'sonner';
@@ -105,76 +105,80 @@ export default function StudentManagement() {
     <AdminLayout>
       <div className="p-6 max-w-7xl mx-auto">
         {/* Header */}
-        <div className="mb-6 flex items-start justify-between">
-          <div>
-            <h1 className="text-2xl mb-2">Student Management</h1>
-            <p className="text-[#757575]">Manage student accounts, assignments, and status</p>
-          </div>
-          <div className="flex gap-2">
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="outline" className="border-[#D0D0D0]">
-                  <Upload className="w-4 h-4 mr-2" />
-                  Bulk Actions
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem onClick={() => navigate('/admin/students/bulk-import')}>
-                  <Upload className="w-4 h-4 mr-2" />
-                  Bulk Import Students
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => navigate('/admin/students/bulk-assign-teacher')}>
-                  <Users className="w-4 h-4 mr-2" />
-                  Bulk Assign to Teacher
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => navigate('/admin/students/bulk-assign-expert')}>
-                  <Brain className="w-4 h-4 mr-2" />
-                  Bulk Assign to Expert
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-            <Button
-              onClick={() => navigate('/admin/students/new')}
-              className="bg-[#333333] hover:bg-[#1A1A1A] text-white"
-            >
-              <Plus className="w-4 h-4 mr-2" />
-              Add Student
-            </Button>
+        <div className="mb-6">
+          <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
+            <div>
+              <h1 className="text-2xl md:text-3xl font-bold text-[#1A1A1A] mb-2">Student Management</h1>
+              <p className="text-sm md:text-base text-[#757575]">Manage student accounts, assignments, and status</p>
+            </div>
+            <div className="flex gap-2">
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline" className="border-[#D0D0D0]">
+                    <Upload className="w-4 h-4 md:mr-2" />
+                    <span className="hidden md:inline">Bulk Actions</span>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem onClick={() => navigate('/admin/students/bulk-import')}>
+                    <Upload className="w-4 h-4 mr-2" />
+                    Bulk Import Students
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => navigate('/admin/students/bulk-assign-teacher')}>
+                    <Users className="w-4 h-4 mr-2" />
+                    Bulk Assign to Teacher
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => navigate('/admin/students/bulk-assign-expert')}>
+                    <Brain className="w-4 h-4 mr-2" />
+                    Bulk Assign to Expert
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+              <Button
+                onClick={() => navigate('/admin/students/new')}
+                className="bg-[#333333] hover:bg-[#1A1A1A] text-white"
+              >
+                <Plus className="w-4 h-4 md:mr-2" />
+                <span className="hidden md:inline">Add Student</span>
+              </Button>
+            </div>
           </div>
         </div>
 
-        <div className="flex gap-4 mb-6">
+        <div className="flex flex-col md:flex-row gap-4 mb-6">
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-[#757575]" />
             <Input
-              placeholder="Search by student name or ID..."
+              placeholder="Search by name or ID..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="pl-10 border-[#D0D0D0] text-[#1A1A1A]"
             />
           </div>
-          <Select value={gradeFilter} onValueChange={setGradeFilter}>
-            <SelectTrigger className="w-48 border-[#D0D0D0] text-[#1A1A1A]">
-              <SelectValue placeholder="All Grades" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Grades</SelectItem>
-              <SelectItem value="2">Grade 2</SelectItem>
-              <SelectItem value="3">Grade 3</SelectItem>
-              <SelectItem value="4">Grade 4</SelectItem>
-              <SelectItem value="5">Grade 5</SelectItem>
-            </SelectContent>
-          </Select>
-          <Select value={statusFilter} onValueChange={setStatusFilter}>
-            <SelectTrigger className="w-48 border-[#D0D0D0] text-[#1A1A1A]">
-              <SelectValue placeholder="All Status" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Status</SelectItem>
-              <SelectItem value="Active">Active</SelectItem>
-              <SelectItem value="Suspended">Suspended</SelectItem>
-            </SelectContent>
-          </Select>
+          <div className="flex gap-2">
+            <Select value={gradeFilter} onValueChange={setGradeFilter}>
+              <SelectTrigger className="w-full md:w-36 border-[#D0D0D0] text-[#1A1A1A]">
+                <SelectValue placeholder="Grade" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Grades</SelectItem>
+                <SelectItem value="2">Grade 2</SelectItem>
+                <SelectItem value="3">Grade 3</SelectItem>
+                <SelectItem value="4">Grade 4</SelectItem>
+                <SelectItem value="5">Grade 5</SelectItem>
+              </SelectContent>
+            </Select>
+            <Select value={statusFilter} onValueChange={setStatusFilter}>
+              <SelectTrigger className="w-full md:w-36 border-[#D0D0D0] text-[#1A1A1A]">
+                <SelectValue placeholder="Status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Status</SelectItem>
+                <SelectItem value="Active">Active</SelectItem>
+                <SelectItem value="Suspended">Suspended</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
         </div>
 
         {/* Bulk Actions Bar */}
@@ -236,97 +240,179 @@ export default function StudentManagement() {
             </div>
           </Card>
         ) : (
-          <div className="bg-white border border-[#D0D0D0] rounded-lg overflow-hidden">
-            <table className="w-full">
-              <thead>
-                <tr className="bg-[#F5F5F5] border-b border-[#D0D0D0]">
-                  <th className="text-left p-4 text-sm font-medium text-[#4A4A4A] w-12">
-                    <Checkbox
-                      checked={selectedStudents.length === filteredStudents.length && filteredStudents.length > 0}
-                      onCheckedChange={toggleAllStudents}
-                    />
-                  </th>
-                  <th className="text-left p-4 text-sm font-medium text-[#4A4A4A]">Name</th>
-                  <th className="text-left p-4 text-sm font-medium text-[#4A4A4A]">Student ID</th>
-                  <th className="text-left p-4 text-sm font-medium text-[#4A4A4A]">Grade</th>
-                  <th className="text-left p-4 text-sm font-medium text-[#4A4A4A]">Primary Teacher</th>
-                  <th className="text-left p-4 text-sm font-medium text-[#4A4A4A]">Status</th>
-                  <th className="text-left p-4 text-sm font-medium text-[#4A4A4A]">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredStudents.map((student, index) => (
-                  <tr
-                    key={student.id}
-                    className={`border-b border-[#E0E0E0] hover:bg-[#FAFAFA] ${
-                      index % 2 === 0 ? 'bg-white' : 'bg-[#FAFAFA]'
-                    }`}
-                  >
-                    <td className="p-4">
+          <>
+            {/* Mobile Card View */}
+            <div className="md:hidden space-y-3">
+              {filteredStudents.map((student) => (
+                <div
+                  key={student.id}
+                  className="bg-white border border-[#D0D0D0] rounded-lg p-4"
+                >
+                  <div className="flex items-start justify-between mb-3">
+                    <div className="flex items-center space-x-3">
                       <Checkbox
                         checked={selectedStudents.includes(student.id)}
                         onCheckedChange={() => toggleStudentSelection(student.id)}
                       />
-                    </td>
-                    <td className="p-4 text-[#1A1A1A] font-medium">{student.name}</td>
-                    <td className="p-4 text-[#4A4A4A]">{student.id}</td>
-                    <td className="p-4 text-[#4A4A4A]">Grade {student.grade}</td>
-                    <td className="p-4 text-[#4A4A4A]">{student.primaryTeacher}</td>
-                    <td className="p-4">
-                      <Badge className="bg-[#333333] text-white">{student.status}</Badge>
-                    </td>
-                    <td className="p-4">
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                            <MoreVertical className="w-4 h-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuItem onClick={() => navigate(`/admin/view-student/${student.id}`)}>
-                            View Profile
+                      <div className="w-10 h-10 rounded-full bg-[#E0E0E0] flex items-center justify-center flex-shrink-0">
+                        <User className="w-5 h-5 text-[#757575]" />
+                      </div>
+                      <div>
+                        <h3 className="font-semibold text-[#1A1A1A]">{student.name}</h3>
+                        <p className="text-sm text-[#757575]">Grade {student.grade}</p>
+                      </div>
+                    </div>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                          <MoreVertical className="w-4 h-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuItem onClick={() => navigate(`/admin/view-student/${student.id}`)}>
+                          View Profile
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => navigate(`/admin/students/edit/${student.id}`)}>
+                          Edit
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => navigate(`/admin/students/${student.id}/assign-teacher`)}>
+                          Assign to Teacher
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => navigate(`/admin/students/${student.id}/assign-expert`)}>
+                          Assign to Expert
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => navigate(`/admin/students/${student.id}/assign-parent`)}>
+                          Assign Parent
+                        </DropdownMenuItem>
+                        {student.status === 'Active' ? (
+                          <DropdownMenuItem
+                            className="text-[#757575]"
+                            onClick={() => {
+                              setSelectedStudent(student.id);
+                              setShowSuspendModal(true);
+                            }}
+                          >
+                            Suspend
                           </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => navigate(`/admin/students/edit/${student.id}`)}>
-                            Edit
+                        ) : (
+                          <DropdownMenuItem
+                            className="text-green-600"
+                            onClick={() => {
+                              setSelectedStudent(student.id);
+                              setShowActivateModal(true);
+                            }}
+                          >
+                            Activate
                           </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => navigate(`/admin/students/${student.id}/assign-teacher`)}>
-                            Assign to Teacher
-                          </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => navigate(`/admin/students/${student.id}/assign-expert`)}>
-                            Assign to Expert
-                          </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => navigate(`/admin/students/${student.id}/assign-parent`)}>
-                            Assign Parent
-                          </DropdownMenuItem>
-                          {student.status === 'Active' ? (
-                            <DropdownMenuItem
-                              className="text-[#757575]"
-                              onClick={() => {
-                                setSelectedStudent(student.id);
-                                setShowSuspendModal(true);
-                              }}
-                            >
-                              Suspend
-                            </DropdownMenuItem>
-                          ) : (
-                            <DropdownMenuItem
-                              className="text-green-600"
-                              onClick={() => {
-                                setSelectedStudent(student.id);
-                                setShowActivateModal(true);
-                              }}
-                            >
-                              Activate
-                            </DropdownMenuItem>
-                          )}
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </td>
+                        )}
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </div>
+                  <div className="flex items-center justify-between text-sm border-t border-[#E0E0E0] pt-3">
+                    <div className="text-[#757575]">
+                      <span>{student.id}</span>
+                      <span className="mx-2">•</span>
+                      <span>{student.primaryTeacher}</span>
+                    </div>
+                    <Badge className="bg-[#333333] text-white">{student.status}</Badge>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Desktop Table View */}
+            <div className="hidden md:block bg-white border border-[#D0D0D0] rounded-lg overflow-hidden">
+              <table className="w-full">
+                <thead>
+                  <tr className="bg-[#F5F5F5] border-b border-[#D0D0D0]">
+                    <th className="text-left p-4 text-sm font-medium text-[#4A4A4A] w-12">
+                      <Checkbox
+                        checked={selectedStudents.length === filteredStudents.length && filteredStudents.length > 0}
+                        onCheckedChange={toggleAllStudents}
+                      />
+                    </th>
+                    <th className="text-left p-4 text-sm font-medium text-[#4A4A4A]">Name</th>
+                    <th className="text-left p-4 text-sm font-medium text-[#4A4A4A]">Student ID</th>
+                    <th className="text-left p-4 text-sm font-medium text-[#4A4A4A]">Grade</th>
+                    <th className="text-left p-4 text-sm font-medium text-[#4A4A4A]">Primary Teacher</th>
+                    <th className="text-left p-4 text-sm font-medium text-[#4A4A4A]">Status</th>
+                    <th className="text-left p-4 text-sm font-medium text-[#4A4A4A]">Actions</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody>
+                  {filteredStudents.map((student, index) => (
+                    <tr
+                      key={student.id}
+                      className={`border-b border-[#E0E0E0] hover:bg-[#FAFAFA] ${
+                        index % 2 === 0 ? 'bg-white' : 'bg-[#FAFAFA]'
+                      }`}
+                    >
+                      <td className="p-4">
+                        <Checkbox
+                          checked={selectedStudents.includes(student.id)}
+                          onCheckedChange={() => toggleStudentSelection(student.id)}
+                        />
+                      </td>
+                      <td className="p-4 text-[#1A1A1A] font-medium">{student.name}</td>
+                      <td className="p-4 text-[#4A4A4A]">{student.id}</td>
+                      <td className="p-4 text-[#4A4A4A]">Grade {student.grade}</td>
+                      <td className="p-4 text-[#4A4A4A]">{student.primaryTeacher}</td>
+                      <td className="p-4">
+                        <Badge className="bg-[#333333] text-white">{student.status}</Badge>
+                      </td>
+                      <td className="p-4">
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                              <MoreVertical className="w-4 h-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuItem onClick={() => navigate(`/admin/view-student/${student.id}`)}>
+                              View Profile
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => navigate(`/admin/students/edit/${student.id}`)}>
+                              Edit
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => navigate(`/admin/students/${student.id}/assign-teacher`)}>
+                              Assign to Teacher
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => navigate(`/admin/students/${student.id}/assign-expert`)}>
+                              Assign to Expert
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => navigate(`/admin/students/${student.id}/assign-parent`)}>
+                              Assign Parent
+                            </DropdownMenuItem>
+                            {student.status === 'Active' ? (
+                              <DropdownMenuItem
+                                className="text-[#757575]"
+                                onClick={() => {
+                                  setSelectedStudent(student.id);
+                                  setShowSuspendModal(true);
+                                }}
+                              >
+                                Suspend
+                              </DropdownMenuItem>
+                            ) : (
+                              <DropdownMenuItem
+                                className="text-green-600"
+                                onClick={() => {
+                                  setSelectedStudent(student.id);
+                                  setShowActivateModal(true);
+                                }}
+                              >
+                                Activate
+                              </DropdownMenuItem>
+                            )}
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </>
         )}
       </div>
 

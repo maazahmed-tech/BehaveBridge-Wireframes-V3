@@ -9,7 +9,7 @@ import { Badge } from '@/app/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/app/components/ui/table';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/app/components/ui/dropdown-menu';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/app/components/ui/dialog';
-import { Search, Plus, MoreVertical, UserCheck, UserX, Upload, Eye, EyeOff } from 'lucide-react';
+import { Search, Plus, MoreVertical, UserCheck, UserX, Upload, Eye, EyeOff, User } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/app/components/ui/select';
 import { toast } from 'sonner';
 
@@ -141,12 +141,12 @@ export default function TeacherManagement() {
       <div className="p-6 max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-6">
-          <h1 className="text-2xl mb-2">Teacher Management</h1>
-          <p className="text-[#757575]">Manage teacher accounts, assignments, and access permissions</p>
+          <h1 className="text-2xl md:text-3xl font-bold text-[#1A1A1A] mb-2">Teacher Management</h1>
+          <p className="text-sm md:text-base text-[#757575]">Manage teacher accounts, assignments, and access permissions</p>
         </div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+        <div className="grid grid-cols-3 gap-2 md:gap-4 mb-6">
           <Card className="border-[#D0D0D0]">
             <CardContent className="pt-6">
               <div className="flex items-center justify-between">
@@ -185,7 +185,7 @@ export default function TeacherManagement() {
         </div>
 
         {/* Actions Bar */}
-        <div className="flex gap-3 mb-6">
+        <div className="flex flex-col md:flex-row gap-3 mb-6">
           <div className="flex-1 relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-[#757575]" />
             <Input
@@ -196,37 +196,89 @@ export default function TeacherManagement() {
               className="pl-10"
             />
           </div>
-          <Select value={statusFilter} onValueChange={setStatusFilter}>
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="Status Filter" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Status</SelectItem>
-              <SelectItem value="active">Active</SelectItem>
-              <SelectItem value="inactive">Inactive</SelectItem>
-            </SelectContent>
-          </Select>
           <div className="flex gap-2">
+            <Select value={statusFilter} onValueChange={setStatusFilter}>
+              <SelectTrigger className="w-full md:w-[140px]">
+                <SelectValue placeholder="Status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Status</SelectItem>
+                <SelectItem value="active">Active</SelectItem>
+                <SelectItem value="inactive">Inactive</SelectItem>
+              </SelectContent>
+            </Select>
             <Button
               variant="outline"
               onClick={() => navigate('/admin/teachers/bulk-import')}
               className="border-[#D0D0D0]"
             >
-              <Upload className="h-4 w-4 mr-2" />
-              Bulk Import
+              <Upload className="h-4 w-4 md:mr-2" />
+              <span className="hidden md:inline">Bulk Import</span>
             </Button>
             <Button
               onClick={() => navigate('/admin/teachers/new')}
               className="bg-[#333333] hover:bg-[#4A4A4A]"
             >
-              <Plus className="h-4 w-4 mr-2" />
-              Add Teacher
+              <Plus className="h-4 w-4 md:mr-2" />
+              <span className="hidden md:inline">Add Teacher</span>
             </Button>
           </div>
         </div>
 
-        {/* Teachers Table */}
-        <Card className="border-[#D0D0D0]">
+        {/* Teachers List */}
+        {/* Mobile Card View */}
+        <div className="md:hidden space-y-3">
+          {filteredTeachers.map((teacher) => (
+            <Card key={teacher.id} className="border-[#D0D0D0]">
+              <CardContent className="p-4">
+                <div className="flex items-start justify-between">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-10 h-10 rounded-full bg-[#E0E0E0] flex items-center justify-center flex-shrink-0">
+                      <User className="w-5 h-5 text-[#757575]" />
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-[#1A1A1A]">{teacher.name}</h3>
+                      <p className="text-sm text-[#757575]">{teacher.role}</p>
+                    </div>
+                  </div>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" size="sm">
+                        <MoreVertical className="h-4 w-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuItem onClick={() => navigate(`/admin/teachers/${teacher.id}/edit`)}>
+                        Edit
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => navigate(`/admin/teachers/${teacher.id}/view`)}>
+                        View Account
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => navigate(`/admin/teachers/${teacher.id}/students`)}>
+                        Assign Students
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => handleResetPassword(teacher)}>
+                        Reset Password
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => handleDeactivate(teacher)}>
+                        {teacher.status === 'Active' ? 'Deactivate' : 'Reactivate'}
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
+                <div className="mt-3 pt-3 border-t border-[#E0E0E0] flex items-center justify-between text-sm">
+                  <span className="text-[#757575] truncate max-w-[200px]">{teacher.email}</span>
+                  <Badge className={teacher.status === 'Active' ? 'bg-[#333333] text-white' : 'bg-[#9E9E9E] text-white'}>
+                    {teacher.status}
+                  </Badge>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+
+        {/* Desktop Table View */}
+        <Card className="border-[#D0D0D0] hidden md:block">
           <CardContent className="p-0">
             <Table>
               <TableHeader>

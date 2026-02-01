@@ -57,10 +57,10 @@ export default function ExpertDashboard() {
     <ExpertLayout>
       <div className="max-w-7xl mx-auto space-y-6">
         <div>
-          <h1 className="text-3xl font-bold text-[#1A1A1A]">
+          <h1 className="text-2xl md:text-3xl font-bold text-[#1A1A1A]">
             Good morning, Dr. Williams
           </h1>
-          <p className="text-[#757575]">{today}</p>
+          <p className="text-sm md:text-base text-[#757575]">{today}</p>
         </div>
 
         {/* Case Statistics */}
@@ -128,8 +128,8 @@ export default function ExpertDashboard() {
                 className="p-4 border border-[#E0E0E0] hover:bg-[#F5F5F5] cursor-pointer"
                 onClick={() => navigate(`/expert/cases/${caseItem.id}`)}
               >
-                <div className="flex items-start justify-between mb-2">
-                  <div className="flex items-center space-x-2">
+                <div className="flex flex-col md:flex-row md:items-start md:justify-between mb-2 space-y-2 md:space-y-0">
+                  <div className="flex items-center space-x-2 flex-wrap">
                     <Badge
                       variant={caseItem.priority === 'High' ? 'default' : 'outline'}
                       className={

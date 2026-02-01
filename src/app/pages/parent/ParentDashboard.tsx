@@ -82,10 +82,10 @@ export default function ParentDashboard() {
     <ParentLayout>
       <div className="max-w-7xl mx-auto space-y-6">
         <div>
-          <h1 className="text-3xl font-bold text-[#1A1A1A]">
+          <h1 className="text-2xl md:text-3xl font-bold text-[#1A1A1A]">
             Welcome, Lisa
           </h1>
-          <p className="text-[#757575]">{today}</p>
+          <p className="text-sm md:text-base text-[#757575]">{today}</p>
         </div>
 
         {/* Child Card */}
@@ -102,7 +102,7 @@ export default function ParentDashboard() {
                   }`}
                   onClick={() => navigate(`/parent/children/${marcusChild.id}/cases/${caseItem.id}`)}
                 >
-                  <div className="flex items-start justify-between mb-3">
+                  <div className="flex flex-col md:flex-row md:items-start md:justify-between mb-3 space-y-2 md:space-y-0">
                     <div className="flex items-center gap-2 flex-wrap">
                       {getSeverityBadge(caseItem.severity)}
                       <Badge className={caseItem.status === 'Under Review' ? 'bg-[#9E9E9E] text-white' : 'bg-[#757575] text-white'}>
@@ -111,11 +111,12 @@ export default function ParentDashboard() {
                       {!caseItem.parentAcknowledged && (
                         <div className="flex items-center gap-1 text-sm text-[#333333] font-medium">
                           <AlertCircle className="w-4 h-4" />
-                          Needs Acknowledgment
+                          <span className="hidden sm:inline">Needs Acknowledgment</span>
+                          <span className="sm:hidden">Action Required</span>
                         </div>
                       )}
                     </div>
-                    <span className="text-xs text-[#757575] whitespace-nowrap ml-2">
+                    <span className="text-xs text-[#757575] whitespace-nowrap">
                       {new Date(caseItem.submittedDate).toLocaleDateString('en-US', {
                         month: 'short',
                         day: 'numeric',
@@ -123,7 +124,7 @@ export default function ParentDashboard() {
                       })}
                     </span>
                   </div>
-                  
+
                   <div className="mb-2">
                     <h4 className="font-semibold text-[#1A1A1A] mb-2">{marcusChild.name}</h4>
                     <div className="text-sm text-[#757575] mb-1">Trigger</div>
@@ -134,7 +135,7 @@ export default function ParentDashboard() {
                     {caseItem.notePreview}
                   </p>
                   
-                  <div className="flex items-center justify-between pt-3 border-t border-[#E0E0E0]">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between pt-3 border-t border-[#E0E0E0] space-y-2 sm:space-y-0">
                     <span className="text-xs text-[#757575]">Case ID: {caseItem.id}</span>
                     <Badge className={caseItem.parentAcknowledged ? 'bg-[#757575] text-white' : 'bg-[#E0E0E0] text-[#4A4A4A]'}>
                       {caseItem.parentAcknowledged ? 'Acknowledged' : 'Not yet acknowledged'}
@@ -150,7 +151,7 @@ export default function ParentDashboard() {
                   }`}
                   onClick={() => navigate(`/parent/children/${emmaChild.id}/cases/${caseItem.id}`)}
                 >
-                  <div className="flex items-start justify-between mb-3">
+                  <div className="flex flex-col md:flex-row md:items-start md:justify-between mb-3 space-y-2 md:space-y-0">
                     <div className="flex items-center gap-2 flex-wrap">
                       {getSeverityBadge(caseItem.severity)}
                       <Badge className={caseItem.status === 'Under Review' ? 'bg-[#9E9E9E] text-white' : 'bg-[#757575] text-white'}>
@@ -159,11 +160,12 @@ export default function ParentDashboard() {
                       {!caseItem.parentAcknowledged && (
                         <div className="flex items-center gap-1 text-sm text-[#333333] font-medium">
                           <AlertCircle className="w-4 h-4" />
-                          Needs Acknowledgment
+                          <span className="hidden sm:inline">Needs Acknowledgment</span>
+                          <span className="sm:hidden">Action Required</span>
                         </div>
                       )}
                     </div>
-                    <span className="text-xs text-[#757575] whitespace-nowrap ml-2">
+                    <span className="text-xs text-[#757575] whitespace-nowrap">
                       {new Date(caseItem.submittedDate).toLocaleDateString('en-US', {
                         month: 'short',
                         day: 'numeric',
@@ -171,7 +173,7 @@ export default function ParentDashboard() {
                       })}
                     </span>
                   </div>
-                  
+
                   <div className="mb-2">
                     <h4 className="font-semibold text-[#1A1A1A] mb-2">{emmaChild.name}</h4>
                     <div className="text-sm text-[#757575] mb-1">Trigger</div>
@@ -182,7 +184,7 @@ export default function ParentDashboard() {
                     {caseItem.notePreview}
                   </p>
                   
-                  <div className="flex items-center justify-between pt-3 border-t border-[#E0E0E0]">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between pt-3 border-t border-[#E0E0E0] space-y-2 sm:space-y-0">
                     <span className="text-xs text-[#757575]">Case ID: {caseItem.id}</span>
                     <Badge className={caseItem.parentAcknowledged ? 'bg-[#757575] text-white' : 'bg-[#E0E0E0] text-[#4A4A4A]'}>
                       {caseItem.parentAcknowledged ? 'Acknowledged' : 'Not yet acknowledged'}
